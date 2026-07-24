@@ -1,0 +1,21 @@
+{
+  "name": "@caos-cm6/demo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@caos-cm6/engine": "workspace:*",
+    "@codemirror/state": "^6.4.1",
+    "codemirror": "^6.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}

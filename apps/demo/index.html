@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CAOS CodeMirror 6 — Phase 1 engine smoke test</title>
+    <style>
+      html, body { height: 100%; margin: 0; font-family: system-ui, sans-serif; }
+      body { padding: 16px; box-sizing: border-box; }
+      #editor { border: 1px solid #999; margin-bottom: 16px; }
+      #editor .cm-editor { height: 200px; }
+      #log {
+        white-space: pre-wrap;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        padding: 8px;
+        background: #111;
+        color: #6f6;
+        height: 300px;
+        overflow: auto;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CAOS → CodeMirror 6 — Phase 1 engine smoke test</h1>
+    <p>Constructs a bare CodeMirror 6 editor, spins up the CAOS engine Worker, and round-trips <code>init</code> / <code>setVariant</code> / <code>fullAnalysis</code> RPC calls. See console + log panel below.</p>
+    <div id="editor"></div>
+    <h2>Worker RPC log</h2>
+    <div id="log"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
