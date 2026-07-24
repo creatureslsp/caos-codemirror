@@ -1,0 +1,26 @@
+{
+  "name": "@caos-cm6/engine",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./worker": "./src/worker/caos.worker.ts",
+    "./main": "./src/main/worker-client.ts",
+    "./shared/*": "./src/shared/*.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p tsconfig.worker.json"
+  },
+  "dependencies": {
+    "@codemirror/state": "^6.4.1",
+    "@creatures-lsp/caos-kt": "link:../../../vs-caos-editor/packages/caos-kt",
+    "@creatures-lsp/caos-util": "link:../../../vs-caos-editor/packages/caos-util"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

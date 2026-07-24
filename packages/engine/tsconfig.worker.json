@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist/worker",
+    "rootDir": "src",
+    "lib": ["ES2022", "WebWorker"],
+    "noEmit": true
+  },
+  "include": [
+    "src/worker/caos.worker.ts",
+    "src/worker/rpc-protocol.ts",
+    "src/worker/request-registry.ts",
+    "src/worker/lib-mode.ts",
+    "src/shared/variant.ts"
+  ]
+}
