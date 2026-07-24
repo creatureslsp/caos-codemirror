@@ -1,0 +1,17 @@
+{
+  "name": "caos-cm6",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "pnpm -r --if-present run test",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "dev": "pnpm --filter @caos-cm6/demo run dev",
+    "build": "pnpm -r --if-present run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}
