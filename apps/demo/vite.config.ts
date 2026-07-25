@@ -11,10 +11,23 @@ import { defineConfig } from "vite";
 // packages instead of a bring-up-phase link:.
 const repoRoot = fileURLToPath(new URL("../../..", import.meta.url));
 
+// bench/index.html (plan/06-mobile-ux-and-performance.md's latency
+// benchmark harness) is a second, standalone page alongside the main demo
+// — Vite's dev server already resolves any *.html path directly with no
+// config, this rollupOptions.input entry is only needed so `vite build`
+// (a real multi-page build) emits it too instead of just the root page.
 export default defineConfig({
   server: {
     fs: {
       allow: [repoRoot],
+    },
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL("./index.html", import.meta.url)),
+        bench: fileURLToPath(new URL("./bench/index.html", import.meta.url)),
+      },
     },
   },
 });
