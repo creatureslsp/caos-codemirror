@@ -19,6 +19,7 @@
 // below already provides the same once-only guard itself.
 import { useFullCaosLibDefinitions } from "@creatures-lsp/caos-kt/caos-libsfile-full";
 import { parseCaos } from "@creatures-lsp/caos-kt/caos-parser";
+import { caosValidationAsDiagnostics } from "@creatures-lsp/caos-kt/caos-validation-report";
 
 import { semanticLegend } from "@creatures-lsp/caos-util/semantics-legend";
 import { getCaosDocumentSemanticTokens } from "@creatures-lsp/caos-util/semantic-highlighter";
@@ -110,12 +111,21 @@ function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): RpcRes
         parseResult,
         cancellationTokenFor(request.id),
       );
+      // Reuses the same parseResult rather than re-parsing (risk #7).
+      // withSuggestions=true: Suggestion.description is folded into the CM6
+      // diagnostic message as a "Hint: ..." suffix by the editor package's
+      // diagnostic-mapper — see plan/03-validation-diagnostics.md.
+      const diagnostics = caosValidationAsDiagnostics(
+        request.variant,
+        parseResult,
+        true,
+        keepGoing,
+      );
       const response: FullAnalysisResponse = {
         id: request.id,
         ok: true,
-        // Real diagnostics/inlayHints are wired in Phases 3/5 respectively,
-        // from this same parseResult.
-        diagnostics: [],
+        // Real inlayHints are wired in Phase 5, from this same parseResult.
+        diagnostics,
         semanticTokensData: semanticTokens.data,
         inlayHints: [],
         scriptCount: parseResult.scripts?.length ?? 0,

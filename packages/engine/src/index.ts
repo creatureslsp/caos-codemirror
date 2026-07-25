@@ -5,6 +5,7 @@ export { GAME_VARIANTS } from "./shared/variant.js";
 export { adjustForIndexing, cmOffsetToLineChar, lineCharToCmOffset } from "./shared/positions.js";
 export type { IndexedLocation, LineChar } from "./shared/positions.js";
 export type {
+  CaosDiagnostic,
   FullAnalysisRequest,
   FullAnalysisResponse,
   InitRequest,

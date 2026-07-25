@@ -40,6 +40,18 @@ export class CaosEngineClient {
   private nextId = 1;
   private revision = 0;
   private readonly pending = new Map<number, PendingEntry>();
+  // Coalesces concurrent/near-simultaneous fullAnalysis() calls for the same
+  // (variant, text) pair into a single worker round trip (plan/00-risks-and-
+  // verified-facts.md risk #7): Phase 2's semantic-tokens plugin and Phase
+  // 3's linter each independently debounce and call fullAnalysis with their
+  // own timers, so without this a keystroke pause could trigger two
+  // requests — each re-parsing the identical document — instead of one.
+  // Keyed by content rather than revision since validity depends on the
+  // text/variant matching, not on request bookkeeping. Kept as a single
+  // most-recent entry (not a full cache) since only back-to-back requests
+  // for the same content need to share a result.
+  private lastAnalysisKey: string | null = null;
+  private lastAnalysisPromise: Promise<FullAnalysisResponse> | null = null;
 
   constructor(private readonly options: CaosEngineClientOptions = {}) {
     this.worker = new Worker(new URL("../worker/caos.worker.ts", import.meta.url), {
@@ -67,7 +79,23 @@ export class CaosEngineClient {
   }
 
   fullAnalysis(variant: GameVariant, text: string): Promise<FullAnalysisResponse> {
-    return this.send({ type: "fullAnalysis", variant, text }) as Promise<FullAnalysisResponse>;
+    const key = `${variant} ${text}`;
+    if (this.lastAnalysisKey === key && this.lastAnalysisPromise) {
+      return this.lastAnalysisPromise;
+    }
+
+    const promise = this.send({ type: "fullAnalysis", variant, text }) as Promise<FullAnalysisResponse>;
+    this.lastAnalysisKey = key;
+    this.lastAnalysisPromise = promise;
+    // Drop the cache entry on failure (cancelled/stale/worker error) so a
+    // retry for the same content doesn't reuse a rejected promise forever.
+    promise.catch(() => {
+      if (this.lastAnalysisPromise === promise) {
+        this.lastAnalysisKey = null;
+        this.lastAnalysisPromise = null;
+      }
+    });
+    return promise;
   }
 
   cancel(id: number): void {

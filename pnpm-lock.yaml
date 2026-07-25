@@ -20,6 +20,9 @@ importers:
       '@caos-cm6/engine':
         specifier: workspace:*
         version: link:../../packages/engine
+      '@codemirror/lint':
+        specifier: ^6.9.7
+        version: 6.9.7
       '@codemirror/state':
         specifier: ^6.4.1
         version: 6.7.1
@@ -42,6 +45,9 @@ importers:
       '@codemirror/language':
         specifier: ^6.12.4
         version: 6.12.4
+      '@codemirror/lint':
+        specifier: ^6.9.7
+        version: 6.9.7
       '@codemirror/state':
         specifier: ^6.4.1
         version: 6.7.1

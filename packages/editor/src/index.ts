@@ -12,3 +12,7 @@ export { buildSemanticDecorations } from "./semantic/build-decorations.js";
 export { decodeSemanticTokens, classNamesFor } from "./semantic/decode-semantic-tokens.js";
 export type { DecodedSemanticToken } from "./semantic/decode-semantic-tokens.js";
 export type { SemanticTokensLegend } from "./semantic/legend.js";
+
+export { caosLinter } from "./lint/caos-linter.js";
+export type { CaosLinterOptions } from "./lint/caos-linter.js";
+export { toCM6Diagnostic } from "./lint/diagnostic-mapper.js";

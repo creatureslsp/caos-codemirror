@@ -2,6 +2,10 @@
 // Plain types/interfaces only — no runtime dependency on either side, and no
 // value imports from "@creatures-lsp/caos-kt" (only erased type-only ones).
 import type { GameVariant } from "../shared/variant.js";
+// Type-only import, erased at compile time — safe per risk #2 (only value
+// imports of the bare "@creatures-lsp/caos-kt" specifier are unsafe).
+import type { Diagnostic as CaosDiagnostic } from "@creatures-lsp/caos-kt/caos-validation-report";
+export type { CaosDiagnostic };
 
 export type RequestKind =
   | "init"
@@ -52,8 +56,10 @@ export interface FullAnalysisRequest extends RpcRequestBase {
 }
 
 export interface FullAnalysisResponse extends RpcResponseBase {
-  /** Diagnostic[] once wired in Phase 3. */
-  diagnostics: unknown[];
+  /** From caosValidationAsDiagnostics — see risk #9 (severity is a checked
+   * "info" | "warning" | "error" union, already resolved, no lookup table
+   * needed). */
+  diagnostics: CaosDiagnostic[];
   /** Flat semantic-token-legend-encoded quintuples once wired in Phase 2. */
   semanticTokensData: number[];
   /** InlayHint[] once wired in Phase 5. */

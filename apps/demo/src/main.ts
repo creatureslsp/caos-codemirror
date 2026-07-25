@@ -1,7 +1,8 @@
 import { basicSetup, EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
+import { lintGutter } from "@codemirror/lint";
 import { CaosEngineClient } from "@caos-cm6/engine";
-import { caosLanguageSupport, semanticTokens, semanticTokensTheme } from "@caos-cm6/editor";
+import { caosLanguageSupport, caosLinter, semanticTokens, semanticTokensTheme } from "@caos-cm6/editor";
 
 const logElQuery = document.querySelector<HTMLDivElement>("#log");
 if (!logElQuery) throw new Error("#log element missing");
@@ -75,13 +76,16 @@ async function main(): Promise<void> {
           debounceMs: 200,
         }),
         semanticTokensTheme,
+        caosLinter({ client, getVariant: () => "DS" }),
+        lintGutter(),
       ],
     }),
     parent: editorParent,
   });
 
-  log("Editor constructed with Layer 1 (StreamLanguage) + Layer 2 (semantic overlay) wired up.");
-  log("Edit the document — the semantic overlay re-analyzes ~200ms after you stop typing.");
+  log("Editor constructed with Layer 1 (StreamLanguage) + Layer 2 (semantic overlay) + Phase 3 diagnostics wired up.");
+  log("Edit the document — the semantic overlay re-analyzes ~200ms, and diagnostics ~300ms, after you stop typing.");
+  log("The 'zzzz' line in the initial doc is deliberately invalid CAOS — it should show a red squiggle + gutter marker.");
 }
 
 main().catch((err) => {

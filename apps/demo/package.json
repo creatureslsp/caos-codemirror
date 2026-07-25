@@ -12,6 +12,7 @@
   "dependencies": {
     "@caos-cm6/editor": "workspace:*",
     "@caos-cm6/engine": "workspace:*",
+    "@codemirror/lint": "^6.9.7",
     "@codemirror/state": "^6.4.1",
     "codemirror": "^6.0.1"
   },
