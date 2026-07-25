@@ -4,8 +4,11 @@ import { lintGutter } from "@codemirror/lint";
 import { CaosEngineClient } from "@caos-cm6/engine";
 import {
   caosCompletion,
+  caosHoverTooltip,
   caosLanguageSupport,
   caosLinter,
+  inlayHints,
+  inlayHintTheme,
   semanticTokens,
   semanticTokensTheme,
 } from "@caos-cm6/editor";
@@ -30,6 +33,8 @@ function log(...args: unknown[]): void {
 // pairs, hex/float/int literals, both operator spellings — plus one
 // deliberately-invalid command ("zzzz") so the semantic overlay's
 // "not-found" modifier (a wavy underline) has something to demonstrate.
+// "attr 3" is Phase 5's verification fixture (plan/05-hover-and-inlay-
+// hints.md item 1): should show an inline "(Carryable,Mouseable)" pill.
 const initialDoc = `**caos2pray
 *#Name = "Phase 2 demo script"
 
@@ -47,6 +52,7 @@ retn
 
 gsub Greet
 anim [0 1 2 3 R]
+attr 3
 
 zzzz
 
@@ -85,15 +91,20 @@ async function main(): Promise<void> {
         caosLinter({ client, getVariant: () => "DS" }),
         lintGutter(),
         caosCompletion({ client, getVariant: () => "DS" }),
+        caosHoverTooltip({ client, getVariant: () => "DS" }),
+        inlayHints({ client, getVariant: () => "DS" }),
+        inlayHintTheme,
       ],
     }),
     parent: editorParent,
   });
 
-  log("Editor constructed with Layer 1 (StreamLanguage) + Layer 2 (semantic overlay) + Phase 3 diagnostics + Phase 4 autocomplete wired up.");
-  log("Edit the document — the semantic overlay re-analyzes ~200ms, and diagnostics ~300ms, after you stop typing.");
+  log("Editor constructed with Layer 1 (StreamLanguage) + Layer 2 (semantic overlay) + Phase 3 diagnostics + Phase 4 autocomplete + Phase 5 hover/inlay hints wired up.");
+  log("Edit the document — the semantic overlay re-analyzes ~200ms, and diagnostics/inlay hints ~300ms/~200ms, after you stop typing.");
   log("The 'zzzz' line in the initial doc is deliberately invalid CAOS — it should show a red squiggle + gutter marker.");
   log("Try typing a partial command (e.g. 'sndl' or 'outs') on a new line to see completions.");
+  log("Hover over a command name (e.g. 'setv', 'outs', 'attr') to see documentation.");
+  log("The 'attr 3' line should show an inline '(Carryable,Mouseable)' inlay hint pill.");
 }
 
 main().catch((err) => {

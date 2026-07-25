@@ -21,3 +21,21 @@ export { caosCompletion } from "./completion/caos-completion.js";
 export { caosCompletionSource } from "./completion/caos-completion-source.js";
 export type { CaosCompletionSourceOptions } from "./completion/caos-completion-source.js";
 export { lspCompletionItemToCM6 } from "./completion/item-converter.js";
+
+export { caosHoverTooltip } from "./hover/hover-tooltip.js";
+export type { CaosHoverTooltipOptions } from "./hover/hover-tooltip.js";
+export { showHoverAt } from "./hover/touch-hover.js";
+export type { ShowHoverAtOptions } from "./hover/touch-hover.js";
+export { renderCaosMarkdownLite } from "./hover/markdown-lite.js";
+
+export { inlayHints } from "./inlay-hints/inlay-hints-plugin.js";
+export type { InlayHintsPluginOptions } from "./inlay-hints/inlay-hints-plugin.js";
+export { inlayHintTheme } from "./inlay-hints/inlay-hint-theme.js";
+export { buildInlayHintDecorations } from "./inlay-hints/build-inlay-hint-decorations.js";
+export { InlayHintWidget } from "./inlay-hints/inlay-hint-widget.js";
+export {
+  DEFAULT_INLAY_HINT_OPTIONS,
+  inlayHintOptionsField,
+  setInlayHintOptions,
+} from "./inlay-hints/inlay-hint-options.js";
+export type { InlayHintOptions } from "./inlay-hints/inlay-hint-options.js";

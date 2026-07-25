@@ -6,6 +6,7 @@ import type {
   CancelRequest,
   FullAnalysisResponse,
   GetCompletionsResponse,
+  GetHoverResponse,
   InitResponse,
   RequestKind,
   RpcRequest,
@@ -79,13 +80,27 @@ export class CaosEngineClient {
     return this.send({ type: "setVariant", variant }) as Promise<SetVariantResponse>;
   }
 
-  fullAnalysis(variant: GameVariant, text: string): Promise<FullAnalysisResponse> {
-    const key = `${variant} ${text}`;
+  fullAnalysis(
+    variant: GameVariant,
+    text: string,
+    disabledInlayHints: string[] = [],
+    minimumParameterCount?: number | null,
+  ): Promise<FullAnalysisResponse> {
+    // Inlay-hint options are part of the cache key (not just variant/text):
+    // toggling them must produce a fresh worker round trip rather than
+    // reusing a memoized response computed under different settings.
+    const key = `${variant} ${minimumParameterCount ?? ""} ${disabledInlayHints.join(",")} ${text}`;
     if (this.lastAnalysisKey === key && this.lastAnalysisPromise) {
       return this.lastAnalysisPromise;
     }
 
-    const promise = this.send({ type: "fullAnalysis", variant, text }) as Promise<FullAnalysisResponse>;
+    const promise = this.send({
+      type: "fullAnalysis",
+      variant,
+      text,
+      disabledInlayHints,
+      minimumParameterCount,
+    }) as Promise<FullAnalysisResponse>;
     this.lastAnalysisKey = key;
     this.lastAnalysisPromise = promise;
     // Drop the cache entry on failure (cancelled/stale/worker error) so a
@@ -120,6 +135,20 @@ export class CaosEngineClient {
       line,
       character,
     }) as Promise<GetCompletionsResponse>;
+  }
+
+  // Deliberately never debounced or memoized, same rationale as
+  // getCompletions above: a hover request fires once per pointer-idle at a
+  // single position and the worker's getHoverItem call is cheap. Staleness
+  // is handled the same generic revision-drop way in handleMessage below.
+  getHover(variant: GameVariant, text: string, line: number, character: number): Promise<GetHoverResponse> {
+    return this.send({
+      type: "getHover",
+      variant,
+      text,
+      line,
+      character,
+    }) as Promise<GetHoverResponse>;
   }
 
   cancel(id: number): void {

@@ -20,6 +20,18 @@
 import { useFullCaosLibDefinitions } from "@creatures-lsp/caos-kt/caos-libsfile-full";
 import { parseCaos } from "@creatures-lsp/caos-kt/caos-parser";
 import { caosValidationAsDiagnostics } from "@creatures-lsp/caos-kt/caos-validation-report";
+// Called directly against the shared parseResult below (plan/05-hover-and-
+// inlay-hints.md's core decision): getCaosInlayHints already returns
+// ready-made InlayHint[] with real positions/labels/tooltips computed by
+// caos-kt's own priority-ordered hint-provider algorithm — no
+// reimplementation. getCaosInlayOptions is read once at init() for a
+// settings UI. Note this is *not* caos-util's inlay-hints.ts wrapper (which
+// the real extension's server calls): that wrapper only adds a +1
+// position.character offset when isVsCode() is true (never true here) and
+// otherwise re-parses from raw text — calling caos-kt's function directly
+// on the parseResult we already have is the more efficient, behaviorally
+// identical choice in this non-VS-Code, shared-parse-result worker.
+import { getCaosInlayHints, getCaosInlayOptions } from "@creatures-lsp/caos-kt/caos-inlay-hints";
 // Type-only: CaosCompletionOptions/CaosCompletionSettings. The actual
 // getCompletionItems implementation used below lives in caos-util, not
 // caos-kt — see the "Engine API used" note above handleRequest's
@@ -29,12 +41,20 @@ import type { CaosCompletionOptions, CaosCompletionSettings } from "@creatures-l
 import { semanticLegend } from "@creatures-lsp/caos-util/semantics-legend";
 import { getCaosDocumentSemanticTokens } from "@creatures-lsp/caos-util/semantic-highlighter";
 import { getCompletionItems } from "@creatures-lsp/caos-util/completions";
+// getHoverItem accepts a string|CaosParseResult union, but "getHover" is a
+// standalone RPC (not folded into fullAnalysis, unlike diagnostics/
+// semantic-tokens/inlay-hints) — hover is requested on-demand at a single
+// cursor position, cheaply, rather than needing the whole-document parse
+// those other features share; so it's passed request.text directly and
+// re-parses internally rather than threading a cached parseResult through.
+import { getHoverItem } from "@creatures-lsp/caos-util/hover-documentation";
 
 import { CAOS_LIB_MODE } from "./lib-mode.js";
 import { beginRequest, cancelRequest, endRequest, keepGoingFor } from "./request-registry.js";
 import type {
   FullAnalysisResponse,
   GetCompletionsResponse,
+  GetHoverResponse,
   InitResponse,
   RpcRequest,
   RpcResponse,
@@ -90,6 +110,7 @@ async function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): 
         id: request.id,
         ok: true,
         semanticTokensLegend: semanticLegend,
+        inlayHintOptions: getCaosInlayOptions(),
       };
       return response;
     }
@@ -128,13 +149,21 @@ async function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): 
         true,
         keepGoing,
       );
+      // Reuses the same parseResult a third time (risk #7) — the plan's
+      // core Phase 5 decision: call caos-kt's algorithm directly rather
+      // than reimplementing bitflag/priority hint logic in TypeScript.
+      const inlayHints = getCaosInlayHints(
+        parseResult,
+        request.disabledInlayHints ?? [],
+        [],
+        request.minimumParameterCount,
+      );
       const response: FullAnalysisResponse = {
         id: request.id,
         ok: true,
-        // Real inlayHints are wired in Phase 5, from this same parseResult.
         diagnostics,
         semanticTokensData: semanticTokens.data,
-        inlayHints: [],
+        inlayHints,
         scriptCount: parseResult.scripts?.length ?? 0,
         itemCount: parseResult.items?.length ?? 0,
       };
@@ -193,6 +222,19 @@ async function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): 
         ok: true,
         isIncomplete: result.isIncomplete,
         items: result.items,
+      };
+      return response;
+    }
+    case "getHover": {
+      ensureInitialized();
+      const hover = getHoverItem(request.variant, request.text, {
+        line: request.line,
+        character: request.character,
+      });
+      const response: GetHoverResponse = {
+        id: request.id,
+        ok: true,
+        hover: hover ?? null,
       };
       return response;
     }
