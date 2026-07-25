@@ -1,16 +1,20 @@
 import { basicSetup, EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { lintGutter } from "@codemirror/lint";
-import { CaosEngineClient } from "@caos-cm6/engine";
+import { CaosEngineClient, chooseEngineLoadTiming, scheduleEngineLoad } from "@caos-cm6/engine";
 import {
   caosCompletion,
   caosHoverTooltip,
   caosLanguageSupport,
   caosLinter,
+  completionTrigger,
   inlayHints,
   inlayHintTheme,
+  mobileHoverTrigger,
+  mobileViewport,
   semanticTokens,
   semanticTokensTheme,
+  touchTheme,
 } from "@caos-cm6/editor";
 
 const logElQuery = document.querySelector<HTMLDivElement>("#log");
@@ -64,10 +68,26 @@ if (!editorParentQuery) throw new Error("#editor element missing");
 const editorParent = editorParentQuery;
 
 async function main(): Promise<void> {
-  log("Constructing CaosEngineClient (this lazily spins up the Worker)...");
-  const client = new CaosEngineClient({
-    onUnexpectedError: (err) => log("Worker error:", err instanceof Error ? err.message : String(err)),
-  });
+  // plan/06-mobile-ux-and-performance.md: on a measurably slow connection
+  // or low-end device, defer constructing CaosEngineClient (and so
+  // fetching the ~549KB worker bundle behind it) until idle or first
+  // interaction with #editor, instead of competing with initial page load.
+  // No signal available at all (most desktop browsers) resolves to
+  // "immediate" — see bundle-strategy.ts's chooseEngineLoadTiming.
+  const timing = chooseEngineLoadTiming();
+  log(`Engine load timing chosen: "${timing}" (device/network heuristic).`);
+  if (timing === "first-interaction") {
+    editorParent.textContent = "Tap/click here to load the CAOS engine and editor…";
+  }
+  const client = await scheduleEngineLoad(
+    () =>
+      new CaosEngineClient({
+        onUnexpectedError: (err) => log("Worker error:", err instanceof Error ? err.message : String(err)),
+      }),
+    { timing, interactionTarget: editorParent },
+  );
+  log("CaosEngineClient constructed.");
+  editorParent.textContent = "";
 
   const initResponse = await client.init();
   log("init() ->", initResponse);
@@ -94,6 +114,14 @@ async function main(): Promise<void> {
         caosHoverTooltip({ client, getVariant: () => "DS" }),
         inlayHints({ client, getVariant: () => "DS" }),
         inlayHintTheme,
+        // Phase 6: touch/pen-only hover trigger (mouse hover above is
+        // untouched by this), keyboard-aware viewport handling, larger
+        // touch targets, and a manual completion-trigger button (there's
+        // no Ctrl+Space on a touch keyboard).
+        mobileHoverTrigger(),
+        mobileViewport(),
+        touchTheme,
+        completionTrigger(),
       ],
     }),
     parent: editorParent,
@@ -105,6 +133,8 @@ async function main(): Promise<void> {
   log("Try typing a partial command (e.g. 'sndl' or 'outs') on a new line to see completions.");
   log("Hover over a command name (e.g. 'setv', 'outs', 'attr') to see documentation.");
   log("The 'attr 3' line should show an inline '(Carryable,Mouseable)' inlay hint pill.");
+  log("On a touch device: tap a command name to see hover docs (no long-press — that's native text-selection's gesture), tap the 'Suggest' button below the editor to trigger completion, and open the on-screen keyboard to confirm the editor/tooltips stay above it.");
+  log("See apps/demo/bench/ for the fullAnalysis latency benchmark harness (plan/06-mobile-ux-and-performance.md verification item 4).");
 }
 
 main().catch((err) => {
