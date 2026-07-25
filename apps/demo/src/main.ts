@@ -1,6 +1,7 @@
 import { basicSetup, EditorView } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { CaosEngineClient } from "@caos-cm6/engine";
+import { caosLanguageSupport, semanticTokens, semanticTokensTheme } from "@caos-cm6/editor";
 
 const logElQuery = document.querySelector<HTMLDivElement>("#log");
 if (!logElQuery) throw new Error("#log element missing");
@@ -16,23 +17,40 @@ function log(...args: unknown[]): void {
   logEl.textContent += line + "\n";
 }
 
-// "*" is CAOS's real line-comment prefix. Deliberately includes an invalid
-// command ("zzzz") afterwards so fullAnalysis has something non-trivial to
-// parse for the smoke test.
-const initialDoc = "* CAOS engine smoke test\nzzzz\n";
+// Exercises every Layer 1/Layer 2 branch from plan/02-syntax-highlighting.md's
+// verification section: comment, CAOS2Pray header + directive line, quoted
+// string with an escape, bracket/byte-string, SUBR/GSUB + label, keyword
+// pairs, hex/float/int literals, both operator spellings — plus one
+// deliberately-invalid command ("zzzz") so the semantic overlay's
+// "not-found" modifier (a wavy underline) has something to demonstrate.
+const initialDoc = `**caos2pray
+*#Name = "Phase 2 demo script"
 
-const editorParent = document.querySelector<HTMLDivElement>("#editor");
-if (!editorParent) throw new Error("#editor element missing");
+* comment, caos2pray header/directive above, this line is a plain comment
+scrp 1 1 1 0
+setv va00 0x1F
+setv va01 3.14
+doif va00 eq 0
+  outs "Hello, \\"world\\"!\\n"
+endi
 
-const view = new EditorView({
-  state: EditorState.create({
-    doc: initialDoc,
-    extensions: [basicSetup],
-  }),
-  parent: editorParent,
-});
+subr Greet
+  outs "Hi from a subroutine\\n"
+retn
 
-async function runSmokeTest(): Promise<void> {
+gsub Greet
+anim [0 1 2 3 R]
+
+zzzz
+
+endm
+`;
+
+const editorParentQuery = document.querySelector<HTMLDivElement>("#editor");
+if (!editorParentQuery) throw new Error("#editor element missing");
+const editorParent = editorParentQuery;
+
+async function main(): Promise<void> {
   log("Constructing CaosEngineClient (this lazily spins up the Worker)...");
   const client = new CaosEngineClient({
     onUnexpectedError: (err) => log("Worker error:", err instanceof Error ? err.message : String(err)),
@@ -44,13 +62,28 @@ async function runSmokeTest(): Promise<void> {
   const setVariantResponse = await client.setVariant("DS");
   log("setVariant('DS') ->", setVariantResponse);
 
-  const text = view.state.doc.toString();
-  const fullAnalysisResponse = await client.fullAnalysis("DS", text);
-  log("fullAnalysis(...) ->", fullAnalysisResponse);
+  new EditorView({
+    state: EditorState.create({
+      doc: initialDoc,
+      extensions: [
+        basicSetup,
+        caosLanguageSupport(),
+        semanticTokens({
+          client,
+          legend: initResponse.semanticTokensLegend,
+          getVariant: () => "DS",
+          debounceMs: 200,
+        }),
+        semanticTokensTheme,
+      ],
+    }),
+    parent: editorParent,
+  });
 
-  log("Smoke test complete — no errors thrown, RPC round-tripped correctly.");
+  log("Editor constructed with Layer 1 (StreamLanguage) + Layer 2 (semantic overlay) wired up.");
+  log("Edit the document — the semantic overlay re-analyzes ~200ms after you stop typing.");
 }
 
-runSmokeTest().catch((err) => {
-  log("Smoke test FAILED:", err instanceof Error ? err.message : String(err));
+main().catch((err) => {
+  log("Demo setup FAILED:", err instanceof Error ? err.message : String(err));
 });

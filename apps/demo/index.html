@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CAOS CodeMirror 6 — Phase 1 engine smoke test</title>
+    <title>CAOS CodeMirror 6 — Phase 2 syntax highlighting</title>
     <style>
       html, body { height: 100%; margin: 0; font-family: system-ui, sans-serif; }
       body { padding: 16px; box-sizing: border-box; }
       #editor { border: 1px solid #999; margin-bottom: 16px; }
-      #editor .cm-editor { height: 200px; }
+      #editor .cm-editor { height: 360px; }
       #log {
         white-space: pre-wrap;
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -23,8 +23,8 @@
     </style>
   </head>
   <body>
-    <h1>CAOS → CodeMirror 6 — Phase 1 engine smoke test</h1>
-    <p>Constructs a bare CodeMirror 6 editor, spins up the CAOS engine Worker, and round-trips <code>init</code> / <code>setVariant</code> / <code>fullAnalysis</code> RPC calls. See console + log panel below.</p>
+    <h1>CAOS → CodeMirror 6 — Phase 2 syntax highlighting</h1>
+    <p>Layer 1 (instant StreamLanguage tokenizer) + Layer 2 (async semantic-token overlay from the engine Worker) wired into a real CodeMirror 6 editor. Edit the document to see the semantic overlay re-resolve after a short debounce — e.g. <code>va00</code>/<code>outs</code>/string escapes sharpen from Layer 1's dull heuristic color to Layer 2's resolved command/variable/string colors once semantic tokens arrive.</p>
     <div id="editor"></div>
     <h2>Worker RPC log</h2>
     <div id="log"></div>
