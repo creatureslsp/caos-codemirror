@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { Text } from "@codemirror/state";
 import { adjustForIndexing, cmOffsetToLineChar, lineCharToCmOffset } from "./positions.js";
-import { caosInitLib } from "@creatures-lsp/caos-kt/caos-init-lib";
 import { useFullCaosLibDefinitions } from "@creatures-lsp/caos-kt/caos-libsfile-full";
 import { caosValidationAsDiagnostics } from "@creatures-lsp/caos-kt/caos-validation-report";
 
-caosInitLib();
+// No caosInitLib() here — see caos.worker.ts's import-discipline comment:
+// it's an orphaned, unexported build artifact in caos-kt's dist/. Calling
+// useFullCaosLibDefinitions() directly is what caosInitLib() would have
+// done anyway, guarded.
 useFullCaosLibDefinitions();
 
 describe("cmOffsetToLineChar / lineCharToCmOffset", () => {
@@ -107,10 +109,10 @@ describe("caos-kt line/offset conventions (empirical, guards against upstream dr
     expect(from).toBeLessThanOrEqual(expectedLineStart + "zzzz".length);
   });
 
-  it("does not throw when caosInitLib is called more than once", () => {
+  it("does not throw when useFullCaosLibDefinitions is called more than once", () => {
     expect(() => {
-      caosInitLib();
-      caosInitLib();
+      useFullCaosLibDefinitions();
+      useFullCaosLibDefinitions();
     }).not.toThrow();
   });
 });

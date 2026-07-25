@@ -7,9 +7,16 @@
 // caos-kt subpath imports, never the bare "@creatures-lsp/caos-kt"
 // specifier as a value import — that eagerly loads the ~549KB full command
 // library as a side effect on module evaluation. This file calls
-// caosInitLib()/useFullCaosLibDefinitions() itself, explicitly, exactly
-// once, in ensureInitialized().
-import { caosInitLib } from "@creatures-lsp/caos-kt/caos-init-lib";
+// useFullCaosLibDefinitions() itself, explicitly, exactly once, in
+// ensureInitialized().
+//
+// Note: caos-kt's dist/ ships a caos-init-lib.mjs (a caosInitLib() helper
+// that just idempotency-guards a call to useFullCaosLibDefinitions()) but
+// it has no corresponding entry in package.json's "exports" map and no
+// source file under src/ — it's an orphaned build artifact, not importable
+// via "@creatures-lsp/caos-kt/caos-init-lib" despite dist/index.mjs's own
+// header comment recommending it. We don't depend on it; ensureInitialized
+// below already provides the same once-only guard itself.
 import { useFullCaosLibDefinitions } from "@creatures-lsp/caos-kt/caos-libsfile-full";
 import { parseCaos } from "@creatures-lsp/caos-kt/caos-parser";
 
@@ -33,7 +40,6 @@ let currentVariant: GameVariant = "DS";
 
 function ensureInitialized(): void {
   if (initialized) return;
-  caosInitLib();
   if (CAOS_LIB_MODE === "full") {
     useFullCaosLibDefinitions();
   } else {
