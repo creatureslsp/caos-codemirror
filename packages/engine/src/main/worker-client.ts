@@ -21,6 +21,17 @@ export interface CaosEngineClientOptions {
   onUnexpectedError?: (error: unknown) => void;
 }
 
+/** Rejection reason used for a request superseded by bumpRevision() (or an
+ * explicit cancel() call) — distinct from a genuine worker/RPC failure so
+ * call sites can tell "this was deliberately abandoned, don't log it as an
+ * error" apart from "something actually went wrong". */
+export class CancelledError extends Error {
+  constructor() {
+    super("cancelled");
+    this.name = "CancelledError";
+  }
+}
+
 interface PendingEntry {
   resolve: (response: RpcResponse) => void;
   reject: (reason: unknown) => void;
@@ -65,10 +76,24 @@ export class CaosEngineClient {
     };
   }
 
-  /** Bump on every document change; requests sent under a revision that is
-   * no longer current have their responses silently dropped. */
+  /** Bump on every document change, and actively cancel every currently
+   * in-flight request (rather than just marking them stale for a
+   * silent-drop at response time): posts a real {type:"cancel"} to the
+   * Worker for each one, so request-registry.ts's keepGoing flag actually
+   * stops caos-kt's parse/validation loop early instead of letting it run
+   * to completion only to have the response discarded on arrival. Every
+   * request sent under a revision that is no longer current would have had
+   * its response dropped anyway (handleMessage below) — this just makes
+   * that abandonment eager instead of wasteful. Safe to call from more than
+   * one plugin on the same transaction (e.g. semantic-tokens-plugin.ts and
+   * inlay-hints-plugin.ts both do): after the first call's cancellations,
+   * `pending` is left with only requests sent under the new revision, so a
+   * second call in the same tick is a no-op. */
   bumpRevision(): number {
     this.revision += 1;
+    for (const id of [...this.pending.keys()]) {
+      this.cancel(id);
+    }
     return this.revision;
   }
 
@@ -157,7 +182,7 @@ export class CaosEngineClient {
     const entry = this.pending.get(id);
     if (entry) {
       this.pending.delete(id);
-      entry.reject(new Error("cancelled"));
+      entry.reject(new CancelledError());
     }
   }
 

@@ -5,7 +5,7 @@
 // CSS). See ../language/stream-parser.ts for Layer 1.
 import { StateEffect, StateField, type Extension } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin, type DecorationSet, type ViewUpdate } from "@codemirror/view";
-import type { CaosEngineClient, GameVariant } from "@caos-cm6/engine";
+import { CancelledError, type CaosEngineClient, type GameVariant } from "@caos-cm6/engine";
 import { buildSemanticDecorations } from "./build-decorations.js";
 import type { SemanticTokensLegend } from "./legend.js";
 
@@ -92,9 +92,15 @@ function analysisDriver(options: SemanticTokensPluginOptions) {
         try {
           response = await client.fullAnalysis(variant, text);
         } catch (err) {
-          // Cancelled/stale (never settles) or a worker error — leave the
-          // last-known-good decorations in place either way.
-          console.error("[caos semanticTokens] fullAnalysis failed:", err);
+          // Leave the last-known-good decorations in place either way.
+          // CancelledError is the expected, silent case — bumpRevision()
+          // actively cancels a request like this one on every subsequent
+          // keystroke, so logging it as an error would spam the console
+          // during ordinary typing. A genuine worker/RPC failure is still
+          // logged.
+          if (!(err instanceof CancelledError)) {
+            console.error("[caos semanticTokens] fullAnalysis failed:", err);
+          }
           return;
         }
 

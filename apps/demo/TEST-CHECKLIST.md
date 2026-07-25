@@ -36,7 +36,7 @@ Fixture: `golden-path.cos` (default on load), Variant: `DS` (default).
 - [ ] `c1e-strings.cos` shows correct string vs. byte-string coloring once semantic tokens resolve (even though the base tokenizer layer treats both uniformly, per Phase 2's design) — load it under the `C1` variant, where it validates cleanly.
 - [ ] `empty.cos` doesn't error on load; typing from empty produces highlighting/completions normally.
 - [ ] `stress-test.cos` — record load/edit latency, compare against Phase 6's benchmark targets (`apps/demo/bench/`).
-- [ ] Rapid typing produces no visible flicker in either highlighting layer, no stale/duplicate diagnostics, no runaway worker requests (verify via DevTools that superseded requests are cancelled, not merely ignored — see the note below, this is a known partial gap).
+- [ ] Rapid typing produces no visible flicker in either highlighting layer, no stale/duplicate diagnostics, no runaway worker requests (verify via DevTools that superseded requests are actually cancelled — `CaosEngineClient.bumpRevision()` now posts a real `{type:"cancel"}` for every in-flight request on each doc change, not just a silent-drop-on-arrival).
 - [ ] Reload with a slow/offline network simulated — confirm a reasonable loading state instead of a silent failure while the worker bundle loads.
 
 ## Mobile pass (repeat golden path + edge cases on)
@@ -49,5 +49,4 @@ Fixture: `golden-path.cos` (default on load), Variant: `DS` (default).
 
 ## Known gaps (accepted, not blocking)
 
-- **Superseded-request cancellation**: `CaosEngineClient` bumps a revision counter on every doc change and *drops* stale responses on arrival, but does not call `client.cancel(id)` on the in-flight request itself — the worker still finishes computing a superseded `fullAnalysis` before its result is discarded. Real cancellation plumbing exists (`request-registry.ts`'s `cancelRequest`/`keepGoingFor`) but no call site in `semantic-tokens-plugin.ts`/`caos-linter.ts`/`inlay-hints-plugin.ts` invokes it yet. Rapid typing is still correct (no stale results ever render) and, per the Phase 6 benchmark numbers, cheap enough in practice not to matter for realistic (~50-line) documents — but DevTools will show every keystroke's worker request running to completion, not aborting mid-flight.
 - **On-device mobile passes**: Phase 6's own verification note already flags that this sandbox's headless Chromium cannot reproduce a real on-screen virtual keyboard or true touch-drag gestures faithfully — the mobile-pass checklist items above need a real device or simulator/emulator to close out, not just DevTools' device-mode viewport resizing.

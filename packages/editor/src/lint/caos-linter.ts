@@ -2,8 +2,9 @@
 // caos-kt's Diagnostic[] to CM6 lint Diagnostic[] via diagnostic-mapper.ts.
 // See plan/03-validation-diagnostics.md.
 import { linter, type Diagnostic as CM6Diagnostic, type LintSource } from "@codemirror/lint";
+import { EditorView } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
-import type { CaosEngineClient, GameVariant } from "@caos-cm6/engine";
+import { CancelledError, type CaosEngineClient, type GameVariant } from "@caos-cm6/engine";
 import { toCM6Diagnostic } from "./diagnostic-mapper.js";
 
 export interface CaosLinterOptions {
@@ -42,7 +43,23 @@ function makeSource(options: CaosLinterOptions): LintSource {
   };
 }
 
+// @codemirror/lint's own lintPlugin logs every rejected source promise via
+// view's logException (state.facet(exceptionSink) -> console.error
+// fallback). Since bumpRevision() now actively cancels a superseded
+// fullAnalysis request instead of leaving it to hang unsettled, that
+// rejection happens on essentially every keystroke during normal typing —
+// exactly the case makeSource's own rethrow comment above already expects
+// and wants (leaves diagnostics untouched), not a real failure worth
+// logging. Installing an exceptionSink here filters that expected case
+// out while still surfacing a genuine worker/RPC error.
+function silenceCancelledExceptions(): Extension {
+  return EditorView.exceptionSink.of((exception) => {
+    if (exception instanceof CancelledError) return;
+    console.error(exception);
+  });
+}
+
 export function caosLinter(options: CaosLinterOptions): Extension {
   const { delay = 300 } = options;
-  return linter(makeSource(options), { delay });
+  return [linter(makeSource(options), { delay }), silenceCancelledExceptions()];
 }

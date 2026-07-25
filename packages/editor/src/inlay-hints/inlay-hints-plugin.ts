@@ -6,7 +6,7 @@
 // guards), plus reacting to live inlay-hint-option changes.
 import { StateEffect, StateField, type Extension } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin, type DecorationSet, type ViewUpdate } from "@codemirror/view";
-import type { CaosEngineClient, GameVariant } from "@caos-cm6/engine";
+import { CancelledError, type CaosEngineClient, type GameVariant } from "@caos-cm6/engine";
 import { buildInlayHintDecorations } from "./build-inlay-hint-decorations.js";
 import { inlayHintOptionsField } from "./inlay-hint-options.js";
 
@@ -85,7 +85,14 @@ function analysisDriver(options: InlayHintsPluginOptions) {
         try {
           response = await client.fullAnalysis(variant, text, disabledInlayHints, minimumParameterCount);
         } catch (err) {
-          console.error("[caos inlayHints] fullAnalysis failed:", err);
+          // CancelledError is the expected, silent case — bumpRevision()
+          // actively cancels a request like this one on every subsequent
+          // keystroke, so logging it as an error would spam the console
+          // during ordinary typing. A genuine worker/RPC failure is still
+          // logged.
+          if (!(err instanceof CancelledError)) {
+            console.error("[caos inlayHints] fullAnalysis failed:", err);
+          }
           return;
         }
 

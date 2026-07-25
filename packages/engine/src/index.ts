@@ -1,4 +1,4 @@
-export { CaosEngineClient } from "./main/worker-client.js";
+export { CancelledError, CaosEngineClient } from "./main/worker-client.js";
 export type { CaosEngineClientOptions } from "./main/worker-client.js";
 export {
   chooseEngineLoadTiming,
