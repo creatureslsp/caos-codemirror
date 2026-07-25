@@ -5,6 +5,7 @@
 import type {
   CancelRequest,
   FullAnalysisResponse,
+  GetCompletionsResponse,
   InitResponse,
   RequestKind,
   RpcRequest,
@@ -96,6 +97,29 @@ export class CaosEngineClient {
       }
     });
     return promise;
+  }
+
+  // Deliberately never debounced or memoized (unlike fullAnalysis above) —
+  // plan/00-risks-and-verified-facts.md risk #7: perceived responsiveness
+  // matters most here, and it's only tenable because the worker calls the
+  // cheap, scoped parseCaosNear internally rather than a full-document
+  // parse. Staleness across rapid keystrokes is still handled generically —
+  // a document edit bumps the revision (see semantic-tokens-plugin.ts),
+  // which drops any in-flight response, including a completions one, whose
+  // revision no longer matches (handleMessage below).
+  getCompletions(
+    variant: GameVariant,
+    text: string,
+    line: number,
+    character: number,
+  ): Promise<GetCompletionsResponse> {
+    return this.send({
+      type: "getCompletions",
+      variant,
+      text,
+      line,
+      character,
+    }) as Promise<GetCompletionsResponse>;
   }
 
   cancel(id: number): void {

@@ -6,6 +6,13 @@ import type { GameVariant } from "../shared/variant.js";
 // imports of the bare "@creatures-lsp/caos-kt" specifier are unsafe).
 import type { Diagnostic as CaosDiagnostic } from "@creatures-lsp/caos-kt/caos-validation-report";
 export type { CaosDiagnostic };
+// vscode-languageserver-types is a real dependency (not the bare caos-kt/
+// caos-util specifier risk #2 warns about) — a pure-ESM, browser-safe types
+// package with no Node dependency, so a runtime (non-type-only) import is
+// also safe wherever the editor package needs the CompletionItemKind/
+// InsertTextFormat enums. Here only the type is needed.
+import type { CompletionItem } from "vscode-languageserver-types";
+export type { CompletionItem as CaosCompletionItem };
 
 export type RequestKind =
   | "init"
@@ -70,6 +77,23 @@ export interface FullAnalysisResponse extends RpcResponseBase {
   itemCount: number;
 }
 
+export interface GetCompletionsRequest extends RpcRequestBase {
+  type: "getCompletions";
+  variant: GameVariant;
+  text: string;
+  /** 0-indexed line/character, converted from the CM6 cursor offset via
+   * positions.ts — no `indexing`-flag ambiguity here (risk #4 only applies
+   * to Diagnostic.location; CaosCompletionOptions/CompletionItem positions
+   * follow caos-kt's plain, always-0-indexed Position/Range type). */
+  line: number;
+  character: number;
+}
+
+export interface GetCompletionsResponse extends RpcResponseBase {
+  isIncomplete: boolean;
+  items: CompletionItem[];
+}
+
 export interface CancelRequest {
   type: "cancel";
   id: number;
@@ -79,6 +103,7 @@ export type RpcRequest =
   | InitRequest
   | SetVariantRequest
   | FullAnalysisRequest
+  | GetCompletionsRequest
   | CancelRequest;
 
 export interface ErrorResponse extends RpcResponseBase {
@@ -90,4 +115,5 @@ export type RpcResponse =
   | InitResponse
   | SetVariantResponse
   | FullAnalysisResponse
+  | GetCompletionsResponse
   | ErrorResponse;

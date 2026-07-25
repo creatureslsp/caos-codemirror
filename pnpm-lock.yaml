@@ -42,6 +42,9 @@ importers:
       '@caos-cm6/engine':
         specifier: workspace:*
         version: link:../engine
+      '@codemirror/autocomplete':
+        specifier: ^6.20.3
+        version: 6.20.3
       '@codemirror/language':
         specifier: ^6.12.4
         version: 6.12.4
@@ -57,6 +60,9 @@ importers:
       '@lezer/highlight':
         specifier: ^1.2.3
         version: 1.2.3
+      vscode-languageserver-types:
+        specifier: ^3.18.0
+        version: 3.18.0
     devDependencies:
       typescript:
         specifier: ^5.6.3
@@ -76,6 +82,9 @@ importers:
       '@creatures-lsp/caos-util':
         specifier: link:../../../vs-caos-editor/packages/caos-util
         version: link:../../../vs-caos-editor/packages/caos-util
+      vscode-languageserver-types:
+        specifier: ^3.18.0
+        version: 3.18.0
     devDependencies:
       typescript:
         specifier: ^5.6.3
@@ -618,6 +627,9 @@ packages:
       jsdom:
         optional: true
 
+  vscode-languageserver-types@3.18.0:
+    resolution: {integrity: sha512-8TsGPNMIMiiBdkORgRSvLjuiEIiAFtO+KssmYWxQ+uSVvlf7RjK8YKCOjPzZ+YA04jXEV7+7LvkSmHkhpNS99g==}
+
   w3c-keyname@2.2.8:
     resolution: {integrity: sha512-dpojBhNsCNN7T82Tm7k26A6G9ML3NkhDsnw9n/eoxSRlVBB4CEtIQ/KTCLI2Fwf3ataSXRhYFkQi3SlnFwPvPQ==}
 
@@ -1076,6 +1088,8 @@ snapshots:
       - sugarss
       - supports-color
       - terser
+
+  vscode-languageserver-types@3.18.0: {}
 
   w3c-keyname@2.2.8: {}
 

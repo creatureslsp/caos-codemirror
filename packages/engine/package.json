@@ -17,7 +17,8 @@
   "dependencies": {
     "@codemirror/state": "^6.4.1",
     "@creatures-lsp/caos-kt": "link:../../../vs-caos-editor/packages/caos-kt",
-    "@creatures-lsp/caos-util": "link:../../../vs-caos-editor/packages/caos-util"
+    "@creatures-lsp/caos-util": "link:../../../vs-caos-editor/packages/caos-util",
+    "vscode-languageserver-types": "^3.18.0"
   },
   "devDependencies": {
     "typescript": "^5.6.3",

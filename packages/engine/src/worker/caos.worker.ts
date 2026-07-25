@@ -20,14 +20,21 @@
 import { useFullCaosLibDefinitions } from "@creatures-lsp/caos-kt/caos-libsfile-full";
 import { parseCaos } from "@creatures-lsp/caos-kt/caos-parser";
 import { caosValidationAsDiagnostics } from "@creatures-lsp/caos-kt/caos-validation-report";
+// Type-only: CaosCompletionOptions/CaosCompletionSettings. The actual
+// getCompletionItems implementation used below lives in caos-util, not
+// caos-kt — see the "Engine API used" note above handleRequest's
+// "getCompletions" case for why.
+import type { CaosCompletionOptions, CaosCompletionSettings } from "@creatures-lsp/caos-kt/caos-completion";
 
 import { semanticLegend } from "@creatures-lsp/caos-util/semantics-legend";
 import { getCaosDocumentSemanticTokens } from "@creatures-lsp/caos-util/semantic-highlighter";
+import { getCompletionItems } from "@creatures-lsp/caos-util/completions";
 
 import { CAOS_LIB_MODE } from "./lib-mode.js";
 import { beginRequest, cancelRequest, endRequest, keepGoingFor } from "./request-registry.js";
 import type {
   FullAnalysisResponse,
+  GetCompletionsResponse,
   InitResponse,
   RpcRequest,
   RpcResponse,
@@ -75,7 +82,7 @@ function cancellationTokenFor(id: number): SemanticCancellationToken {
   };
 }
 
-function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): RpcResponse {
+async function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): Promise<RpcResponse> {
   switch (request.type) {
     case "init": {
       ensureInitialized();
@@ -133,6 +140,62 @@ function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): RpcRes
       };
       return response;
     }
+    case "getCompletions": {
+      ensureInitialized();
+      // Engine API used: caos-util's getCompletionItems (not caos-kt's own
+      // exported getCaosCompletionItems from caos-completion.d.mts). The
+      // real extension's server (server/src/caos/caos.completions.ts)
+      // deliberately doesn't call the caos-kt export either (imported and
+      // commented out there) — caos-util's version is the one with the
+      // real command/bitflag/values-list/lvalue/rvalue completion logic;
+      // caos-kt's is a lower-level building block the extension doesn't
+      // use directly. Following the extension's own precedent (plan's core
+      // thesis), not the plan doc's original guess at the API surface.
+      //
+      // keepGoing is accepted by CaosCompletionOptions but verified unused
+      // by getCompletionItems' actual implementation (no reference to
+      // opts.keepGoing anywhere in caos-util/src) — passed anyway for type
+      // fidelity/documentation, not because it does anything today. This is
+      // fine because completions are deliberately never debounced/cancelled
+      // server-side (risk #7); staleness is instead handled by the main
+      // thread's revision-based response dropping (worker-client.ts).
+      const keepGoing = keepGoingFor(request.id);
+      const settings: CaosCompletionSettings = {
+        usePlaceholders: true,
+        dumbMode: false,
+        // No inlay hints yet (Phase 5) to offload parameter names onto, so
+        // keep full "name:type" text in snippet placeholders rather than
+        // stripping to bare types. Revisit once Phase 5 lands — see
+        // plan/04-autocomplete.md's shared minimumParameterCount note.
+        parameterInlayHints: false,
+        minimumParameterCount: 2,
+      };
+      const options: CaosCompletionOptions = {
+        incomplete: true,
+        directory: "",
+        // No virtual filesystem in this web port (single in-memory buffer,
+        // no workspace) — intentional scope reduction, not a bug. Disables
+        // file-path completion for commands that take filenames.
+        getFiles: async () => [],
+        keepGoing,
+      };
+      const result = await getCompletionItems(
+        "document.cos",
+        request.variant,
+        request.text,
+        { line: request.line, character: request.character },
+        options,
+        settings,
+      );
+
+      const response: GetCompletionsResponse = {
+        id: request.id,
+        ok: true,
+        isIncomplete: result.isIncomplete,
+        items: result.items,
+      };
+      return response;
+    }
   }
 }
 
@@ -145,16 +208,18 @@ self.onmessage = (event: MessageEvent<RpcRequest>) => {
   }
 
   beginRequest(request.id);
-  try {
-    post(handleRequest(request));
-  } catch (err) {
-    console.error("[caos.worker] request failed:", request.type, err);
-    post({
-      id: request.id,
-      ok: false,
-      error: err instanceof Error ? err.message : String(err),
-    });
-  } finally {
-    endRequest(request.id);
-  }
+  void (async () => {
+    try {
+      post(await handleRequest(request));
+    } catch (err) {
+      console.error("[caos.worker] request failed:", request.type, err);
+      post({
+        id: request.id,
+        ok: false,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      endRequest(request.id);
+    }
+  })();
 };
