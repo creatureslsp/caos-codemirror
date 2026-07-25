@@ -21,6 +21,7 @@ import { useFullCaosLibDefinitions } from "@creatures-lsp/caos-kt/caos-libsfile-
 import { parseCaos } from "@creatures-lsp/caos-kt/caos-parser";
 
 import { semanticLegend } from "@creatures-lsp/caos-util/semantics-legend";
+import { getCaosDocumentSemanticTokens } from "@creatures-lsp/caos-util/semantic-highlighter";
 
 import { CAOS_LIB_MODE } from "./lib-mode.js";
 import { beginRequest, cancelRequest, endRequest, keepGoingFor } from "./request-registry.js";
@@ -52,6 +53,27 @@ function post(response: RpcResponse): void {
   self.postMessage(response);
 }
 
+// Derived structurally from getCaosDocumentSemanticTokens's own parameter
+// type rather than importing "vscode-languageserver-types" directly (not a
+// declared dependency of this package — caos-util re-exports its types).
+type SemanticCancellationToken = NonNullable<
+  Parameters<typeof getCaosDocumentSemanticTokens>[2]
+>;
+
+/** Adapts this worker's request-registry cancellation flag (risk #3 — a
+ * flag, not a cross-postMessage closure) to caos-util's CancellationToken
+ * shape. `onCancellationRequested` is unused by semantic-highlighter's own
+ * cancellation checks but required by the type. */
+function cancellationTokenFor(id: number): SemanticCancellationToken {
+  const keepGoing = keepGoingFor(id);
+  return {
+    get isCancellationRequested() {
+      return !keepGoing();
+    },
+    onCancellationRequested: () => ({ dispose() {} }),
+  };
+}
+
 function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): RpcResponse {
   switch (request.type) {
     case "init": {
@@ -77,13 +99,24 @@ function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): RpcRes
       ensureInitialized();
       const keepGoing = keepGoingFor(request.id);
       const parseResult = parseCaos(request.variant, request.text, keepGoing);
+      // Reuse the same parseResult for semantic tokens instead of a second
+      // parse (plan/00-risks-and-verified-facts.md risk #7) —
+      // getCaosDocumentSemanticTokens accepts a CaosParseResult directly.
+      // (This previously crashed due to a bug in caos-util's Is.parseResult
+      // — checked result.command instead of result.commandCalls, so a real
+      // CaosParseResult was never recognized as one — now fixed upstream.)
+      const semanticTokens = getCaosDocumentSemanticTokens(
+        request.variant,
+        parseResult,
+        cancellationTokenFor(request.id),
+      );
       const response: FullAnalysisResponse = {
         id: request.id,
         ok: true,
-        // Real diagnostics/semanticTokensData/inlayHints are wired in
-        // Phases 3/2/5 respectively, from this same parseResult.
+        // Real diagnostics/inlayHints are wired in Phases 3/5 respectively,
+        // from this same parseResult.
         diagnostics: [],
-        semanticTokensData: [],
+        semanticTokensData: semanticTokens.data,
         inlayHints: [],
         scriptCount: parseResult.scripts?.length ?? 0,
         itemCount: parseResult.items?.length ?? 0,
@@ -105,6 +138,7 @@ self.onmessage = (event: MessageEvent<RpcRequest>) => {
   try {
     post(handleRequest(request));
   } catch (err) {
+    console.error("[caos.worker] request failed:", request.type, err);
     post({
       id: request.id,
       ok: false,
