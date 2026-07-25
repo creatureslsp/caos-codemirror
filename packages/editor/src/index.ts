@@ -39,3 +39,11 @@ export {
   setInlayHintOptions,
 } from "./inlay-hints/inlay-hint-options.js";
 export type { InlayHintOptions } from "./inlay-hints/inlay-hint-options.js";
+
+export { mobileHoverTrigger } from "./mobile/touch-hover.js";
+export type { MobileHoverTrigger, MobileHoverTriggerOptions } from "./mobile/touch-hover.js";
+export { mobileViewport } from "./mobile/viewport.js";
+export type { MobileViewportOptions } from "./mobile/viewport.js";
+export { touchTheme } from "./mobile/touch-theme.js";
+export { completionTrigger } from "./mobile/completion-trigger.js";
+export type { CompletionTriggerOptions } from "./mobile/completion-trigger.js";
