@@ -31,6 +31,31 @@ importers:
         specifier: ^5.4.10
         version: 5.4.21
 
+  packages/editor:
+    dependencies:
+      '@caos-cm6/engine':
+        specifier: workspace:*
+        version: link:../engine
+      '@codemirror/language':
+        specifier: ^6.12.4
+        version: 6.12.4
+      '@codemirror/state':
+        specifier: ^6.4.1
+        version: 6.7.1
+      '@codemirror/view':
+        specifier: ^6.43.6
+        version: 6.43.6
+      '@lezer/highlight':
+        specifier: ^1.2.3
+        version: 1.2.3
+    devDependencies:
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.4
+        version: 2.1.9
+
   packages/engine:
     dependencies:
       '@codemirror/state':
