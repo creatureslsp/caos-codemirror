@@ -1,5 +1,15 @@
 export { CaosEngineClient } from "./main/worker-client.js";
 export type { CaosEngineClientOptions } from "./main/worker-client.js";
+export {
+  chooseEngineLoadTiming,
+  readDeviceSignals,
+  scheduleEngineLoad,
+} from "./main/bundle-strategy.js";
+export type {
+  DeviceSignals,
+  EngineLoadTiming,
+  ScheduleEngineLoadOptions,
+} from "./main/bundle-strategy.js";
 export type { GameVariant } from "./shared/variant.js";
 export { GAME_VARIANTS } from "./shared/variant.js";
 export { adjustForIndexing, cmOffsetToLineChar, lineCharToCmOffset } from "./shared/positions.js";
