@@ -1,0 +1,895 @@
+* stress-test.cos -- generated, large multi-script document for the
+* Phase 6 fullAnalysis latency benchmark harness (apps/demo/bench/) and
+* manual load/edit-latency spot checks (plan/07-demo-app-and-verification.md
+* edge cases). Concatenated short per-agent event scripts, matching how a
+* real .cos file actually grows large in practice -- not one deeply nested
+* script.
+
+scrp 1 1 1 0
+setv va00 0
+doif va00 eq 0
+  outs "block 0"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 1
+setv va00 1
+doif va00 eq 0
+  outs "block 1"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 2
+setv va00 2
+doif va00 eq 0
+  outs "block 2"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 3
+setv va00 3
+doif va00 eq 0
+  outs "block 3"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 4
+setv va00 4
+doif va00 eq 0
+  outs "block 4"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 5
+setv va00 5
+doif va00 eq 0
+  outs "block 5"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 6
+setv va00 6
+doif va00 eq 0
+  outs "block 6"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 7
+setv va00 7
+doif va00 eq 0
+  outs "block 7"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 8
+setv va00 8
+doif va00 eq 0
+  outs "block 8"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 9
+setv va00 9
+doif va00 eq 0
+  outs "block 9"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 10
+setv va00 10
+doif va00 eq 0
+  outs "block 10"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 11
+setv va00 11
+doif va00 eq 0
+  outs "block 11"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 12
+setv va00 12
+doif va00 eq 0
+  outs "block 12"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 13
+setv va00 13
+doif va00 eq 0
+  outs "block 13"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 14
+setv va00 14
+doif va00 eq 0
+  outs "block 14"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 15
+setv va00 15
+doif va00 eq 0
+  outs "block 15"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 16
+setv va00 16
+doif va00 eq 0
+  outs "block 16"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 17
+setv va00 17
+doif va00 eq 0
+  outs "block 17"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 18
+setv va00 18
+doif va00 eq 0
+  outs "block 18"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 19
+setv va00 19
+doif va00 eq 0
+  outs "block 19"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 20
+setv va00 20
+doif va00 eq 0
+  outs "block 20"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 21
+setv va00 21
+doif va00 eq 0
+  outs "block 21"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 22
+setv va00 22
+doif va00 eq 0
+  outs "block 22"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 23
+setv va00 23
+doif va00 eq 0
+  outs "block 23"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 24
+setv va00 24
+doif va00 eq 0
+  outs "block 24"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 25
+setv va00 25
+doif va00 eq 0
+  outs "block 25"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 26
+setv va00 26
+doif va00 eq 0
+  outs "block 26"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 27
+setv va00 27
+doif va00 eq 0
+  outs "block 27"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 28
+setv va00 28
+doif va00 eq 0
+  outs "block 28"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 29
+setv va00 29
+doif va00 eq 0
+  outs "block 29"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 30
+setv va00 30
+doif va00 eq 0
+  outs "block 30"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 31
+setv va00 31
+doif va00 eq 0
+  outs "block 31"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 32
+setv va00 32
+doif va00 eq 0
+  outs "block 32"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 33
+setv va00 33
+doif va00 eq 0
+  outs "block 33"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 34
+setv va00 34
+doif va00 eq 0
+  outs "block 34"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 35
+setv va00 35
+doif va00 eq 0
+  outs "block 35"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 36
+setv va00 36
+doif va00 eq 0
+  outs "block 36"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 37
+setv va00 37
+doif va00 eq 0
+  outs "block 37"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 38
+setv va00 38
+doif va00 eq 0
+  outs "block 38"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 39
+setv va00 39
+doif va00 eq 0
+  outs "block 39"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 40
+setv va00 40
+doif va00 eq 0
+  outs "block 40"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 41
+setv va00 41
+doif va00 eq 0
+  outs "block 41"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 42
+setv va00 42
+doif va00 eq 0
+  outs "block 42"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 43
+setv va00 43
+doif va00 eq 0
+  outs "block 43"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 44
+setv va00 44
+doif va00 eq 0
+  outs "block 44"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 45
+setv va00 45
+doif va00 eq 0
+  outs "block 45"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 46
+setv va00 46
+doif va00 eq 0
+  outs "block 46"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 47
+setv va00 47
+doif va00 eq 0
+  outs "block 47"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 48
+setv va00 48
+doif va00 eq 0
+  outs "block 48"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 49
+setv va00 49
+doif va00 eq 0
+  outs "block 49"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 50
+setv va00 50
+doif va00 eq 0
+  outs "block 50"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 51
+setv va00 51
+doif va00 eq 0
+  outs "block 51"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 52
+setv va00 52
+doif va00 eq 0
+  outs "block 52"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 53
+setv va00 53
+doif va00 eq 0
+  outs "block 53"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 54
+setv va00 54
+doif va00 eq 0
+  outs "block 54"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 55
+setv va00 55
+doif va00 eq 0
+  outs "block 55"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 56
+setv va00 56
+doif va00 eq 0
+  outs "block 56"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 57
+setv va00 57
+doif va00 eq 0
+  outs "block 57"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 58
+setv va00 58
+doif va00 eq 0
+  outs "block 58"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 59
+setv va00 59
+doif va00 eq 0
+  outs "block 59"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 60
+setv va00 60
+doif va00 eq 0
+  outs "block 60"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 61
+setv va00 61
+doif va00 eq 0
+  outs "block 61"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 62
+setv va00 62
+doif va00 eq 0
+  outs "block 62"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 63
+setv va00 63
+doif va00 eq 0
+  outs "block 63"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 64
+setv va00 64
+doif va00 eq 0
+  outs "block 64"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 65
+setv va00 65
+doif va00 eq 0
+  outs "block 65"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 66
+setv va00 66
+doif va00 eq 0
+  outs "block 66"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 67
+setv va00 67
+doif va00 eq 0
+  outs "block 67"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 68
+setv va00 68
+doif va00 eq 0
+  outs "block 68"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 69
+setv va00 69
+doif va00 eq 0
+  outs "block 69"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 70
+setv va00 70
+doif va00 eq 0
+  outs "block 70"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 71
+setv va00 71
+doif va00 eq 0
+  outs "block 71"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 72
+setv va00 72
+doif va00 eq 0
+  outs "block 72"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 73
+setv va00 73
+doif va00 eq 0
+  outs "block 73"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 74
+setv va00 74
+doif va00 eq 0
+  outs "block 74"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 75
+setv va00 75
+doif va00 eq 0
+  outs "block 75"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 76
+setv va00 76
+doif va00 eq 0
+  outs "block 76"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 77
+setv va00 77
+doif va00 eq 0
+  outs "block 77"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 78
+setv va00 78
+doif va00 eq 0
+  outs "block 78"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 79
+setv va00 79
+doif va00 eq 0
+  outs "block 79"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 80
+setv va00 80
+doif va00 eq 0
+  outs "block 80"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 81
+setv va00 81
+doif va00 eq 0
+  outs "block 81"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 82
+setv va00 82
+doif va00 eq 0
+  outs "block 82"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 83
+setv va00 83
+doif va00 eq 0
+  outs "block 83"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 84
+setv va00 84
+doif va00 eq 0
+  outs "block 84"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 85
+setv va00 85
+doif va00 eq 0
+  outs "block 85"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 86
+setv va00 86
+doif va00 eq 0
+  outs "block 86"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 87
+setv va00 87
+doif va00 eq 0
+  outs "block 87"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 88
+setv va00 88
+doif va00 eq 0
+  outs "block 88"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 89
+setv va00 89
+doif va00 eq 0
+  outs "block 89"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 90
+setv va00 90
+doif va00 eq 0
+  outs "block 90"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 91
+setv va00 91
+doif va00 eq 0
+  outs "block 91"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 92
+setv va00 92
+doif va00 eq 0
+  outs "block 92"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 93
+setv va00 93
+doif va00 eq 0
+  outs "block 93"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 94
+setv va00 94
+doif va00 eq 0
+  outs "block 94"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 95
+setv va00 95
+doif va00 eq 0
+  outs "block 95"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 96
+setv va00 96
+doif va00 eq 0
+  outs "block 96"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 97
+setv va00 97
+doif va00 eq 0
+  outs "block 97"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 98
+setv va00 98
+doif va00 eq 0
+  outs "block 98"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 99
+setv va00 99
+doif va00 eq 0
+  outs "block 99"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 100
+setv va00 100
+doif va00 eq 0
+  outs "block 100"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 101
+setv va00 101
+doif va00 eq 0
+  outs "block 101"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 102
+setv va00 102
+doif va00 eq 0
+  outs "block 102"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 103
+setv va00 103
+doif va00 eq 0
+  outs "block 103"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 104
+setv va00 104
+doif va00 eq 0
+  outs "block 104"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 105
+setv va00 105
+doif va00 eq 0
+  outs "block 105"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 106
+setv va00 106
+doif va00 eq 0
+  outs "block 106"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 107
+setv va00 107
+doif va00 eq 0
+  outs "block 107"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 108
+setv va00 108
+doif va00 eq 0
+  outs "block 108"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 109
+setv va00 109
+doif va00 eq 0
+  outs "block 109"
+endi
+addv va01 1
+attr 3
+endm
+scrp 1 1 1 110
+setv va00 110
+doif va00 eq 0
+  outs "block 110"
+endi
+addv va01 1
+attr 3
+endm

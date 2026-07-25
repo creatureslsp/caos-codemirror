@@ -1,0 +1,18 @@
+* broken.cos — deliberately invalid CAOS for diagnostics testing
+* (plan/07-demo-app-and-verification.md edge cases). Three distinct kinds
+* of error on purpose: unknown command, wrong argument type, unterminated
+* DOIF.
+
+scrp 1 1 1 0
+
+* Unknown command
+zzzz 1 2 3
+
+* Wrong argument type (SETV's 2nd param wants a decimal, not a string)
+setv va00 "not a number"
+
+* Unterminated DOIF (no matching ENDI before ENDM)
+doif va00 eq 0
+  outs "never closed\n"
+
+endm

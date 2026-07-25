@@ -1,0 +1,9 @@
+**CAOS2Pray JOIN
+*# Link "Test3.cos"
+*# Agent Animation String = "0"
+*# Agent Bioenergy Value = 0
+*# Link ""
+
+scrp 1 1 1 0
+outs "This is a CAOS file wrapped in a CAOS2Pray header\n"
+endm

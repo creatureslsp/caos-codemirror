@@ -1,0 +1,19 @@
+* c1e-strings.cos — exercises both C1e bracket-strings and byte-strings,
+* both `[`/`]`-delimited (plan/07-demo-app-and-verification.md edge cases;
+* see docs/vs-caos-editor-architecture.md's Strings note). Layer 1's
+* tokenizer treats both uniformly; the semantic-tokens overlay is what
+* disambiguates them once resolved (byte-string modifier vs. plain string).
+* Load this fixture against the C1 variant (C1e bracket-strings and the
+* legacy `R`-repeat animation suffix are not valid in CV+ variants — see
+* fixtures/bitflag-heavy.cos's golden-path sibling, which had to switch to
+* a literal 255 for DS).
+
+* Byte-string: digit/R content, used for ANIM's poseList argument. No
+* spaces allowed in C1/C2 variants (unlike CV+, which also allows the
+* space-separated form).
+anim [0123R]
+
+* C1e bracket-string: legacy alternative to a quoted string literal, valid
+* wherever a plain [string]-typed parameter is expected (e.g. DBGM's
+* debug-message argument).
+dbgm [Hello world]

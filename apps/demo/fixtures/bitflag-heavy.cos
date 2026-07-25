@@ -1,0 +1,20 @@
+* bitflag-heavy.cos — an ATTR-bitflag-rich script for showcasing inlay
+* hints (plan/05-hover-and-inlay-hints.md). Each ATTR line below sets a
+* different combination of bits; hovering/inspecting each should render a
+* "(Name,Name,...)" pill matching vs-caos-editor's own output for the same
+* file/variant.
+
+scrp 2 1 1000 0
+attr 0
+attr 1
+attr 2
+attr 3
+attr 4
+attr 5
+attr 6
+attr 7
+attr 8
+attr 16
+attr 512
+attr 517
+endm

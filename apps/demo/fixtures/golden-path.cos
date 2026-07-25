@@ -1,0 +1,24 @@
+* golden-path.cos — common commands, subroutines, and event scripts.
+* Deliberately error-free: TEST-CHECKLIST.md's golden-path pass expects
+* zero diagnostics for this file.
+
+**caos2pray
+*#Name = "Golden path demo"
+
+scrp 1 1 1 0
+setv va00 31
+setv va01 3.14
+doif va00 eq 0
+  outs "Hello, \"world\"!\n"
+else
+  sndl "c2sl"
+endi
+
+gsub Greet
+attr 3
+anim [0 1 2 3 255]
+endm
+
+subr Greet
+  outs "Hi from a subroutine\n"
+retn

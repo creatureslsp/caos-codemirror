@@ -3,12 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CAOS CodeMirror 6 — Phase 2 syntax highlighting</title>
+    <title>CAOS CodeMirror 6 — demo</title>
     <style>
       html, body { height: 100%; margin: 0; font-family: system-ui, sans-serif; }
       body { padding: 16px; box-sizing: border-box; }
+      #toolbar { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+      #toolbar label { display: flex; align-items: center; gap: 4px; font-size: 14px; }
+      #main-row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+      #editor-column { flex: 1 1 480px; min-width: 280px; }
       #editor { border: 1px solid #999; margin-bottom: 16px; }
       #editor .cm-editor { height: 360px; }
+      #sidebar {
+        flex: 0 0 260px;
+        border: 1px solid #999;
+        border-radius: 4px;
+        padding: 12px;
+        font-size: 14px;
+      }
+      #sidebar h2 { margin-top: 0; font-size: 16px; }
+      #sidebar h3 { font-size: 14px; margin-bottom: 6px; }
+      .panel-checkbox-row { display: block; font-size: 13px; margin-bottom: 2px; }
+      .panel-min-param-row { display: block; margin-top: 8px; font-size: 13px; }
+      .panel-min-param-row input { width: 4rem; }
       #log {
         white-space: pre-wrap;
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -16,18 +32,29 @@
         padding: 8px;
         background: #111;
         color: #6f6;
-        height: 300px;
+        height: 260px;
         overflow: auto;
         border-radius: 4px;
       }
     </style>
   </head>
   <body>
-    <h1>CAOS → CodeMirror 6 — Phase 2 syntax highlighting</h1>
-    <p>Layer 1 (instant StreamLanguage tokenizer) + Layer 2 (async semantic-token overlay from the engine Worker) wired into a real CodeMirror 6 editor. Edit the document to see the semantic overlay re-resolve after a short debounce — e.g. <code>va00</code>/<code>outs</code>/string escapes sharpen from Layer 1's dull heuristic color to Layer 2's resolved command/variable/string colors once semantic tokens arrive.</p>
-    <div id="editor"></div>
-    <h2>Worker RPC log</h2>
-    <div id="log"></div>
+    <h1>CAOS → CodeMirror 6 — demo</h1>
+    <p>
+      Every feature from Phases 1–6 wired together: instant syntax highlighting, an async semantic-token
+      overlay, validation diagnostics, autocomplete, hover documentation, inlay hints, and mobile touch
+      UX. See <code>apps/demo/TEST-CHECKLIST.md</code> for the manual verification checklist this app exists
+      to support.
+    </p>
+    <div id="toolbar"></div>
+    <div id="main-row">
+      <div id="editor-column">
+        <div id="editor"></div>
+        <h2>Worker RPC log</h2>
+        <div id="log"></div>
+      </div>
+      <div id="sidebar"></div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
