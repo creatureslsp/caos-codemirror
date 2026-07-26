@@ -64,12 +64,18 @@ importers:
       '@preact/preset-vite':
         specifier: ^2.9.3
         version: 2.10.6(@babel/core@7.29.7)(preact@10.29.7)(rollup@4.62.2)(vite@5.4.21)
+      fake-indexeddb:
+        specifier: ^6.0.0
+        version: 6.2.5
       typescript:
         specifier: ^5.6.3
         version: 5.9.3
       vite:
         specifier: ^5.4.10
         version: 5.4.21
+      vitest:
+        specifier: ^2.1.4
+        version: 2.1.9
 
   packages/editor:
     dependencies:
@@ -736,6 +742,10 @@ packages:
   expect-type@1.4.0:
     resolution: {integrity: sha512-KfYbmpRm0VbLjEvVa9yGwCi9GI34xvi7A/HXYWQO65CSD2u3MczUJSuwXKFIxlGsgBQizV9q5J9NHj4VG0n+pA==}
     engines: {node: '>=12.0.0'}
+
+  fake-indexeddb@6.2.5:
+    resolution: {integrity: sha512-CGnyrvbhPlWYMngksqrSSUT1BAVP49dZocrHuK0SvtR0D5TMs5wP0o3j7jexDJW01KSadjBp1M/71o/KR3nD1w==}
+    engines: {node: '>=18'}
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -1576,6 +1586,8 @@ snapshots:
       '@types/estree': 1.0.9
 
   expect-type@1.4.0: {}
+
+  fake-indexeddb@6.2.5: {}
 
   fsevents@2.3.3:
     optional: true
