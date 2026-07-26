@@ -44,11 +44,11 @@ export function adjustForIndexing(location: IndexedLocation, doc: Text): { from:
     doc,
     location.startLine - lineOffset,
     location.startColumn - columnOffset,
-  );
+  ) + (location.startColumn === 1 ? 0 : 1);
   const to = lineCharToCmOffset(
     doc,
     location.endLine - lineOffset,
     location.endColumn - columnOffset,
-  );
+  ) + 1;
   return { from, to };
 }
