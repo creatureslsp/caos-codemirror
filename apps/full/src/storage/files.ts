@@ -46,6 +46,18 @@ async function getFileRecord(id: string): Promise<FileRecord> {
   return record;
 }
 
+/**
+ * Boot-time lookup for the last-opened file: unlike `getFileRecord`, a
+ * missing row (deleted, or from a stale/cleared `kv.lastOpenedFileId`) is an
+ * expected outcome, not an error — callers fall back to a fresh draft.
+ */
+export async function getFile(id: string): Promise<CaosFile | null> {
+  const db = await openDb();
+  const tx = db.transaction(STORE_FILES, "readonly");
+  const record = await promisifyRequest<FileRecord | undefined>(tx.objectStore(STORE_FILES).get(id));
+  return record ? toPublicFile(record) : null;
+}
+
 async function getProjectRecord(id: string): Promise<ProjectRecord> {
   const db = await openDb();
   const tx = db.transaction(STORE_PROJECTS, "readonly");

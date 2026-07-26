@@ -25,15 +25,22 @@ import {
 } from "@creatures-codemirror/editor";
 import { Shell } from "./shell.js";
 import { VariantPicker } from "./variant-picker.js";
+import { VariantChangePrompt } from "./variant-change-prompt.js";
 import { CaosPanel } from "./panel.js";
 import { FileBrowser } from "./files/FileBrowser.js";
+import { checkNameConflict, createFile, changeFileVariant, getFile, type CaosFile } from "./storage/files.js";
+import {
+  changeProjectVariant,
+  getEffectiveVariant,
+  getProject,
+  sweepExpiredTrash,
+  type CaosProject,
+} from "./storage/projects.js";
+import { kvGet, kvSet } from "./storage/db.js";
+import { createAutosaveController, fileLoadAnnotation, LAST_OPENED_FILE_ID_KEY } from "./autosave.js";
 
-import empty from "../fixtures/empty.cos?raw";
-
-const FIXTURES: Record<string, string> = {
-  "new.cos": empty
-};
-const DEFAULT_FIXTURE = "new.cos";
+const GLOBAL_FALLBACK_VARIANT_KEY = "globalFallbackVariant";
+const DEFAULT_VARIANT: GameVariant = "DS";
 
 let logEl: HTMLDivElement | null = null;
 
@@ -65,9 +72,43 @@ render(
 
 logEl = document.querySelector<HTMLDivElement>("#log");
 
+/**
+ * Resolves the boot-time file/variant per
+ * `../../plan-webapp/04-variant-persistence-autosave.md`'s boot sequence:
+ * restore `kv.lastOpenedFileId` if it still points at a live row (trashed is
+ * fine, hard-deleted is not — `getFile` returns `null` for that), else fall
+ * back to `kv.globalFallbackVariant` (or a hardcoded default) and create a
+ * fresh root-scope draft.
+ */
+async function resolveBootFile(): Promise<{ file: CaosFile; project: CaosProject | null; variant: GameVariant }> {
+  const lastOpenedFileId = await kvGet<string>(LAST_OPENED_FILE_ID_KEY);
+  if (lastOpenedFileId) {
+    const file = await getFile(lastOpenedFileId);
+    if (file) {
+      const project = file.parentProjectId === null ? null : await getProject(file.parentProjectId);
+      const variant = getEffectiveVariant(file, project);
+      return { file, project, variant };
+    }
+  }
+
+  const fallbackVariant = (await kvGet<GameVariant>(GLOBAL_FALLBACK_VARIANT_KEY)) ?? DEFAULT_VARIANT;
+  let name = "Untitled";
+  let n = 2;
+  while (await checkNameConflict(null, name)) {
+    name = `Untitled (${n})`;
+    n += 1;
+  }
+  const file = await createFile({ name, parentProjectId: null, variant: fallbackVariant, text: "" });
+  return { file, project: null, variant: fallbackVariant };
+}
+
 async function main(): Promise<void> {
   if (!editorParent) throw new Error("Shell did not mount an editor container");
   const editorContainer = editorParent;
+
+  // Not a background timer — run once per boot, per
+  // ../../plan-webapp/00-risks-and-open-questions.md's trash-retention note.
+  await sweepExpiredTrash();
 
   const timing = chooseEngineLoadTiming();
   log(`Engine load timing chosen: "${timing}" (device/network heuristic).`);
@@ -87,9 +128,22 @@ async function main(): Promise<void> {
   const initResponse = await client.init();
   log("init() ->", initResponse);
 
-  let currentVariant: GameVariant = "DS";
+  const boot = await resolveBootFile();
+  let activeFile: CaosFile = boot.file;
+  let activeProject: CaosProject | null = boot.project;
+  let currentVariant: GameVariant = boot.variant;
   await client.setVariant(currentVariant);
-  log(`setVariant('${currentVariant}') -> ok`);
+  log(`setVariant('${currentVariant}') -> ok (restored file "${activeFile.name}")`);
+
+  const autosave = createAutosaveController({
+    onError: (err) => log("Autosave FAILED:", err instanceof Error ? err.message : String(err)),
+  });
+
+  // Prompt state for "just this file" vs "whole project" on a project file's
+  // variant change; `null` when no prompt is showing. Plain closure state
+  // (not a signal) — resolved the same imperative way `currentVariant` is,
+  // via `rebuildSheetBody()`.
+  let pendingVariantPrompt: { variant: GameVariant } | null = null;
 
   // Compartment allowing dynamic reconfiguration on variant switch
   const analysisCompartment = new Compartment();
@@ -116,7 +170,7 @@ async function main(): Promise<void> {
 
   const view = new EditorView({
     state: EditorState.create({
-      doc: FIXTURES[DEFAULT_FIXTURE],
+      doc: activeFile.text,
       extensions: [
         basicSetup,
         caosLanguageSupport(),
@@ -125,6 +179,7 @@ async function main(): Promise<void> {
         mobileViewport(),
         touchTheme,
         completionTrigger(),
+        autosave.extension,
         EditorView.updateListener.of((update) => {
           diagnosticsCount.value = diagnosticCount(update.state);
         }),
@@ -133,12 +188,65 @@ async function main(): Promise<void> {
     parent: editorContainer,
   });
 
+  await autosave.openFile(activeFile.id);
+
+  async function applyVariantToEditor(variant: GameVariant): Promise<void> {
+    currentVariant = variant;
+    log(`Variant changed to ${variant} — re-validating.`);
+    await client.setVariant(variant);
+    view.dispatch({ effects: analysisCompartment.reconfigure(buildAnalysisExtensions()) });
+  }
+
+  async function applyFileOnlyVariantChange(variant: GameVariant): Promise<void> {
+    const updated = await changeFileVariant(activeFile.id, variant);
+    activeFile = updated;
+    if (updated.parentProjectId === null) {
+      // Root files have no project to attach the choice to — treat it as the
+      // new standalone/global default for the next fallback draft too.
+      await kvSet(GLOBAL_FALLBACK_VARIANT_KEY, variant);
+    }
+    pendingVariantPrompt = null;
+    await applyVariantToEditor(variant);
+    rebuildSheetBody();
+  }
+
+  async function applyWholeProjectVariantChange(variant: GameVariant): Promise<void> {
+    if (!activeProject) return;
+    activeProject = await changeProjectVariant(activeProject.id, variant);
+    pendingVariantPrompt = null;
+    // The active file may itself carry an explicit override that this
+    // project-wide change doesn't touch (only `variant: null` siblings
+    // inherit it) — re-resolve rather than assuming `variant` now applies to
+    // the open document, so the picker/live validation don't drift from what
+    // a reload would actually restore for this file.
+    await applyVariantToEditor(getEffectiveVariant(activeFile, activeProject));
+    rebuildSheetBody();
+  }
+
+  function cancelVariantChange(): void {
+    pendingVariantPrompt = null;
+    // Re-sync VariantPicker's <select> back to `currentVariant`, undoing the
+    // browser's already-applied (but not yet confirmed) native selection.
+    rebuildSheetBody();
+  }
+
+  function requestVariantChange(variant: GameVariant): void {
+    if (variant === currentVariant) return;
+    if (activeFile.parentProjectId === null || activeProject === null) {
+      void applyFileOnlyVariantChange(variant);
+      return;
+    }
+    pendingVariantPrompt = { variant };
+    rebuildSheetBody();
+  }
+
   // Reassigning `sheetBody.value` re-renders Shell's `{sheetBody.value}` slot, but
   // Preact's positional reconciliation preserves each child component's own
   // internal state (FileBrowser's browsing state, CaosPanel's checkboxes) across
   // the reassignment — only needed here because a programmatic variant change
-  // (opening a file with a different effective variant) has to force
-  // VariantPicker's <select> to a new value, unlike a user-driven picker change.
+  // (opening a file with a different effective variant, or resolving the
+  // file/project prompt) has to force VariantPicker's <select> to a new
+  // value, unlike a user-driven picker change.
   function rebuildSheetBody(): void {
     sheetBody.value = h(
       "div",
@@ -146,27 +254,29 @@ async function main(): Promise<void> {
       h(FileBrowser, {
         getEditorText: () => view.state.doc.toString(),
         onFileOpened: (file, effectiveVariant) => {
-          view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: file.text } });
-          log(`Opened file "${file.name}".`);
-          if (effectiveVariant !== currentVariant) {
-            currentVariant = effectiveVariant;
-            log(`Variant changed to ${effectiveVariant} (from opened file) — re-validating.`);
-            void client.setVariant(currentVariant).then(() => {
-              view.dispatch({ effects: analysisCompartment.reconfigure(buildAnalysisExtensions()) });
+          void (async () => {
+            // Flush the outgoing file's pending edits (autosave reads the
+            // editor's *current* text, so this must happen before the doc is
+            // replaced below) then switch autosave tracking to the new file.
+            await autosave.openFile(file.id);
+            view.dispatch({
+              changes: { from: 0, to: view.state.doc.length, insert: file.text },
+              annotations: fileLoadAnnotation,
             });
+            activeFile = file;
+            activeProject = file.parentProjectId === null ? null : await getProject(file.parentProjectId);
+            pendingVariantPrompt = null;
+            log(`Opened file "${file.name}".`);
+            if (effectiveVariant !== currentVariant) {
+              await applyVariantToEditor(effectiveVariant);
+            }
             rebuildSheetBody();
-          }
+          })();
         },
       }),
       h(VariantPicker, {
         initialVariant: currentVariant,
-        onChange: (variant) => {
-          currentVariant = variant;
-          log(`Variant changed to ${variant} — re-validating.`);
-          void client.setVariant(variant).then(() => {
-            view.dispatch({ effects: analysisCompartment.reconfigure(buildAnalysisExtensions()) });
-          });
-        },
+        onChange: requestVariantChange,
       }),
       h(CaosPanel, {
         inlayHintOptionIds: initResponse.inlayHintOptions,
@@ -177,6 +287,16 @@ async function main(): Promise<void> {
           log("Inlay hint options changed:", options);
         },
       }),
+      pendingVariantPrompt &&
+        activeProject &&
+        h(VariantChangePrompt, {
+          fileName: activeFile.name,
+          projectName: activeProject.name,
+          variant: pendingVariantPrompt.variant,
+          onFileOnly: () => void applyFileOnlyVariantChange(pendingVariantPrompt!.variant),
+          onWholeProject: () => void applyWholeProjectVariantChange(pendingVariantPrompt!.variant),
+          onCancel: cancelVariantChange,
+        }),
     );
   }
 

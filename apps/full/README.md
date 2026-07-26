@@ -33,13 +33,18 @@ diagnostics, autocomplete, hover docs, and inlay hints all wired up, plus:
   sheet — echoes engine lifecycle events (Worker load timing chosen,
   `init()`/`setVariant()` results, variant switches).
 
-An IndexedDB storage layer exists (`src/storage/` — file/project CRUD, trash
-and undelete, variant inheritance, search/sort; see
-[`../../plan-webapp/02-storage-layer.md`](../../plan-webapp/02-storage-layer.md)),
-but nothing in the UI calls it yet. There is currently no in-app fixture
-picker: `fixtures/empty.cos` is the only document this app loads today
-(`main.ts`'s `FIXTURES`/`DEFAULT_FIXTURE`); real file open/management arrives
-in Phase 03, which wires this storage layer into a file/project browser.
+An IndexedDB storage layer (`src/storage/` — file/project CRUD, trash and
+undelete, variant inheritance, search/sort; see
+[`../../plan-webapp/02-storage-layer.md`](../../plan-webapp/02-storage-layer.md))
+backs a full file/project browser in the menu sheet (create/rename/move/
+delete/undelete, search, sort, open a `.cos` from disk, download the current
+file). On top of that, the app persists as you work: edits autosave to the
+active file a few hundred ms after you stop typing (flushed immediately on
+tab-switch/backgrounding too, not just on the debounce), the last-opened file
+and its resolved variant restore automatically on reload, and changing the
+Variant picker on a file that belongs to a project asks whether to apply the
+change to just that file or to the whole project. See
+[`../../plan-webapp/04-variant-persistence-autosave.md`](../../plan-webapp/04-variant-persistence-autosave.md).
 Offline support and theming are later phases still.
 
 See **[`TEST-CHECKLIST.md`](./TEST-CHECKLIST.md)** for the manual

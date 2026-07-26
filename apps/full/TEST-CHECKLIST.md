@@ -15,11 +15,13 @@ hover/completion status, inlay-hint category checkboxes +
 `minimumParameterCount` control), and a **Show log**/**Hide log** toggle for
 the (hidden-by-default) log pane. The sheet's primary content is now the
 Phase 03 file/project browser (project chips, search/sort, file list,
-trash), followed by the Variant picker and status panel. There is still no
-fixture picker distinct from real file management — to exercise the
-scenarios below that need specific fixture content, paste it into the
-editor manually, use "Open from disk…" on a local copy of a fixture, or
-temporarily point `main.ts`'s `FIXTURES` at `apps/demo/fixtures/*.cos`.
+trash), followed by the Variant picker and status panel. There is no fixture
+picker distinct from real file management — to exercise the scenarios below
+that need specific fixture content, paste it into the editor manually, or use
+"Open from disk…" on a local copy of a fixture. As of Phase 04, the app boots
+into whatever file/variant you last had open (or a fresh untitled draft on
+the very first visit) and autosaves as you type — see that section below
+before assuming a blank slate at the start of a pass.
 
 ## Shell (Phase 01)
 
@@ -88,6 +90,44 @@ temporarily point `main.ts`'s `FIXTURES` at `apps/demo/fixtures/*.cos`.
       once ever (first successful create/open-from-disk across the app's
       lifetime, persisted via the `kv` store — not once per session).
 
+## Variant persistence, autosave, last-file restore (Phase 04)
+
+- [ ] Type in the editor, wait ~1s (past the ~600ms debounce), then check
+      DevTools → Application → IndexedDB → `caos-editor` → `files`: the
+      active file's row `text`/`lastModifiedDate` updated with no explicit
+      save action.
+- [ ] Type, then immediately switch tabs/apps (or simulate
+      `document.visibilityState` → `"hidden"` + a `visibilitychange` event)
+      *before* the debounce would fire: the edit is persisted anyway (proves
+      the flush trigger, not just the debounce, is doing real work).
+- [ ] Reload the page (hard reload): the last-opened file's content and its
+      *resolved* variant (own override, or its project's if inherited) come
+      back automatically — no fixture, no blank editor.
+- [ ] First-ever visit (fresh/cleared IndexedDB): boots into a new untitled
+      draft at root with the global fallback variant (`DS` if never set),
+      not an error or blank unusable state.
+- [ ] Switch files via the browser, then reload without any further edit:
+      the file you switched *to* restores, not the one open before that —
+      proves `kv.lastOpenedFileId` updates on open, not only on a debounced
+      save.
+- [ ] Open a file that belongs to a project, then change the **Variant**
+      picker (the one in the sheet, not a file row's own variant select): a
+      prompt appears — "Just this file" vs "Whole project". Cancelling
+      leaves everything unchanged and reverts the picker's displayed value.
+- [ ] Choose "Just this file": only that file's own `variant` changes (an
+      explicit override); its project's `variant` and every sibling are
+      untouched.
+- [ ] Choose "Whole project" on a file that **inherits** (`variant: null`):
+      the project's `variant` changes and the picker reflects the new value
+      for this file too.
+- [ ] Choose "Whole project" on a file that already has its **own**
+      override: the project's `variant` still changes (and affects
+      inheriting siblings), but this file's own override — and therefore the
+      picker's displayed value and the live validation — is unaffected,
+      since the project change never touched this file's row.
+- [ ] Change the variant on a **root-scope** file (no project): no prompt at
+      all, applies immediately.
+
 ## Golden path
 
 Variant: `DS` (default).
@@ -110,7 +150,7 @@ Variant: `DS` (default).
 - [ ] A script with deliberate errors (e.g. `apps/demo/fixtures/broken.cos`'s contents: unknown command `zzzz`, wrong-argument-type `setv va00 "not a number"`, unterminated `DOIF`) shows three distinct, correctly positioned, correctly worded diagnostics with gutter markers.
 - [ ] CAOS2Pray header content shows correct tag/directive coloring on the `**CAOS2Pray` and `*#` lines.
 - [ ] C1e string content shows correct string vs. byte-string coloring once semantic tokens resolve, under the `C1` variant where it validates cleanly.
-- [ ] `empty.cos` (the current default/only fixture) doesn't error on load; typing from empty produces highlighting/completions normally.
+- [ ] A brand-new empty draft (first-ever visit, or an explicitly created empty file) doesn't error on load; typing from empty produces highlighting/completions normally.
 - [ ] A large/stress-test document — record load/edit latency, compare against Phase 6's benchmark targets (`bench/`).
 - [ ] Rapid typing produces no visible flicker in either highlighting layer, no stale/duplicate diagnostics, no runaway worker requests (verify via DevTools that superseded requests are actually cancelled).
 - [ ] Reload with a slow/offline network simulated — confirm a reasonable loading state instead of a silent failure while the worker bundle loads.

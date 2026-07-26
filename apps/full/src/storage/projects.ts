@@ -47,6 +47,18 @@ async function getProjectRecord(id: string): Promise<ProjectRecord> {
   return record;
 }
 
+/**
+ * Boot-time/prompt lookup for a file's parent project: unlike
+ * `getProjectRecord`, a missing row is an expected outcome (not an error) for
+ * callers resolving a possibly-stale `parentProjectId`.
+ */
+export async function getProject(id: string): Promise<CaosProject | null> {
+  const db = await openDb();
+  const tx = db.transaction(STORE_PROJECTS, "readonly");
+  const record = await promisifyRequest<ProjectRecord | undefined>(tx.objectStore(STORE_PROJECTS).get(id));
+  return record ? toPublicProject(record) : null;
+}
+
 async function allProjectRecords(): Promise<ProjectRecord[]> {
   const db = await openDb();
   const tx = db.transaction(STORE_PROJECTS, "readonly");
