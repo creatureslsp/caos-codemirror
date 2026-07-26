@@ -120,8 +120,8 @@ importers:
         specifier: ^6.4.1
         version: 6.7.1
       '@creatureslsp/caos':
-        specifier: 0.0.3
-        version: 0.0.3
+        specifier: 0.0.4
+        version: 0.0.4
       vscode-languageserver-types:
         specifier: ^3.18.0
         version: 3.18.0
@@ -681,14 +681,14 @@ packages:
   '@codemirror/view@6.43.6':
     resolution: {integrity: sha512-EVunGSYN1wz1p75WY1s3Xg7t3i8Yol0kGZGizNdX9BUFgMFILYVe8/u6EVpo7Ff5PwbZuILb4QAq7IZoKzIEQA==}
 
-  '@creatureslsp/caos-kt@0.0.3':
-    resolution: {integrity: sha512-SH0TDuMCiF9xLW51OYAwZActnXQtG4yE8gN4LLBdhZMT3KIfUQC3fvHBqi/ZzwrxrXkRh5zVHkdrfwFnNdZpyQ==}
+  '@creatureslsp/caos-kt@0.0.4':
+    resolution: {integrity: sha512-2/AlzUnAMVWt3CjF+iKZXbpttQsGXrOmmtpQcOYKglanNuP0mspuwvQfaqEi3tbA6a0fw4giTPqNRrgEht8Q2A==}
 
-  '@creatureslsp/caos@0.0.3':
-    resolution: {integrity: sha512-eKgKCrxctxE+jslmOG31hiJzggSeeCppH/BZ6pMHcnon0sJrU5CVMrjxzyYNZUHO5BClVzlcRH1inpU/3jpFPA==}
+  '@creatureslsp/caos@0.0.4':
+    resolution: {integrity: sha512-7gexFh/+CDqLTkppaWf0AlrUUArzAQhD5/2EjuYSMm7xJIr+et5HKoRGVVhG1PEOsrTmFUpdiY9MfLDrCycm8w==}
 
-  '@creatureslsp/extension-util@0.0.3':
-    resolution: {integrity: sha512-ZjyrkOZxyh6iNnbqJnq1boTzuc2hrOO1o/7YTl0l/97sIMISVwO3qZzXoHlZmYMpYPtI1YoI7lsc9OvdZpExtg==}
+  '@creatureslsp/extension-util@0.0.4':
+    resolution: {integrity: sha512-rYxHLPldrOPqfLJUxAjhizc44i4O6KMrFNrTm2Fd5FjTymKwxyepXzdDP87/fVNTvwmtNRMldkFlL+LjtePthQ==}
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -2991,16 +2991,16 @@ snapshots:
       style-mod: 4.1.3
       w3c-keyname: 2.2.8
 
-  '@creatureslsp/caos-kt@0.0.3':
+  '@creatureslsp/caos-kt@0.0.4':
     dependencies:
       vscode-languageserver: 9.0.1
 
-  '@creatureslsp/caos@0.0.3':
+  '@creatureslsp/caos@0.0.4':
     dependencies:
-      '@creatureslsp/caos-kt': 0.0.3
-      '@creatureslsp/extension-util': 0.0.3
+      '@creatureslsp/caos-kt': 0.0.4
+      '@creatureslsp/extension-util': 0.0.4
 
-  '@creatureslsp/extension-util@0.0.3':
+  '@creatureslsp/extension-util@0.0.4':
     dependencies:
       vscode-languageserver: 9.0.1
       vscode-languageserver-textdocument: 1.0.12

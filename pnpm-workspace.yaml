@@ -4,6 +4,6 @@ packages:
 allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
-  - '@creatureslsp/caos-kt@0.0.2 || 0.0.3'
-  - '@creatureslsp/caos@0.0.2 || 0.0.3'
-  - '@creatureslsp/extension-util@0.0.2 || 0.0.3'
+  - '@creatureslsp/caos-kt@0.0.2 || 0.0.3 || 0.0.4'
+  - '@creatureslsp/caos@0.0.2 || 0.0.3 || 0.0.4'
+  - '@creatureslsp/extension-util@0.0.2 || 0.0.3 || 0.0.4'
