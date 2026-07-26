@@ -3,7 +3,7 @@
 import { useFullCaosLibDefinitions } from "@creatureslsp/caos/libsfile-full";
 import { parseCaos } from "@creatureslsp/caos/parser";
 import { caosValidationAsDiagnostics } from "@creatureslsp/caos/validation-report";
-import { getCaosInlayHints, getCaosInlayOptions} from "@creatureslsp/caos/inlay-hints";
+import { getCaosInlayHintsWithOffset, getCaosInlayOptions} from "@creatureslsp/caos/inlay-hints";
 import type { CaosCompletionOptions, CaosCompletionSettings } from "@creatureslsp/caos/completions";
 import { getCompletionItems } from "@creatureslsp/caos/completions";
 import { semanticLegend } from "@creatureslsp/caos/semantics-legend";
@@ -95,11 +95,12 @@ async function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): 
         true,
         keepGoing,
       );
-      const inlayHints = getCaosInlayHints(
+      const inlayHints = getCaosInlayHintsWithOffset(
+        request.variant,
         parseResult,
         request.disabledInlayHints ?? [],
-        [],
         request.minimumParameterCount,
+        1,
       );
       const response: FullAnalysisResponse = {
         id: request.id,
