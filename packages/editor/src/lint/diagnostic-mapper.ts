@@ -3,8 +3,8 @@
 // the import aliases below are deliberately unambiguous.
 import type { Text } from "@codemirror/state";
 import type { Diagnostic as CM6Diagnostic } from "@codemirror/lint";
-import type { CaosDiagnostic } from "@caos-cm6/engine";
-import { adjustForIndexing } from "@caos-cm6/engine";
+import type { CaosDiagnostic } from "@creatures-codemirror/engine";
+import { adjustForIndexing } from "@creatures-codemirror/engine";
 
 /**
  * Severity is an identity mapping (plan/00-risks-and-verified-facts.md

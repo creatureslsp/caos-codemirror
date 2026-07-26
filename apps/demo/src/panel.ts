@@ -3,7 +3,7 @@
 // inlay-hint category checkboxes/minimumParameterCount control — so the
 // manual test checklist has something concrete to look at rather than
 // wiring these features silently.
-import type { InlayHintOptions } from "@caos-cm6/editor";
+import type { InlayHintOptions } from "@creatures-codemirror/editor";
 
 export interface CaosPanelOptions {
   /** Provider ids from InitResponse.inlayHintOptions (getCaosInlayOptions()). */

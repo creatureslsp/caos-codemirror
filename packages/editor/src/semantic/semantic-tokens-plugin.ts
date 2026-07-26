@@ -5,7 +5,7 @@
 // CSS). See ../language/stream-parser.ts for Layer 1.
 import { StateEffect, StateField, type Extension } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin, type DecorationSet, type ViewUpdate } from "@codemirror/view";
-import { CancelledError, type CaosEngineClient, type GameVariant } from "@caos-cm6/engine";
+import { CancelledError, type CaosEngineClient, type GameVariant } from "@creatures-codemirror/engine";
 import { buildSemanticDecorations } from "./build-decorations.js";
 import type { SemanticTokensLegend } from "./legend.js";
 

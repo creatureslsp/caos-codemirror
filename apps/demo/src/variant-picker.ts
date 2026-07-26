@@ -3,8 +3,8 @@
 // "Variant behavior" checklist section): switching variants should
 // re-validate and change completion/hint results without recreating the
 // whole EditorView.
-import type { GameVariant } from "@caos-cm6/engine";
-import { GAME_VARIANTS } from "@caos-cm6/engine";
+import type { GameVariant } from "@creatures-codemirror/engine";
+import { GAME_VARIANTS } from "@creatures-codemirror/engine";
 
 export interface VariantPickerOptions {
   initialVariant: GameVariant;

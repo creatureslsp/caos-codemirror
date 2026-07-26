@@ -1,7 +1,7 @@
 import type { Text } from "@codemirror/state";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, type DecorationSet } from "@codemirror/view";
-import { lineCharToCmOffset } from "@caos-cm6/engine";
+import { lineCharToCmOffset } from "@creatures-codemirror/engine";
 import { classNamesFor, decodeSemanticTokens } from "./decode-semantic-tokens.js";
 import type { SemanticTokensLegend } from "./legend.js";
 

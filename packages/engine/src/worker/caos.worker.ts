@@ -17,37 +17,15 @@
 // via "@creatures-lsp/caos-kt/caos-init-lib" despite dist/index.mjs's own
 // header comment recommending it. We don't depend on it; ensureInitialized
 // below already provides the same once-only guard itself.
-import { useFullCaosLibDefinitions } from "@creatures-lsp/caos-kt/caos-libsfile-full";
-import { parseCaos } from "@creatures-lsp/caos-kt/caos-parser";
-import { caosValidationAsDiagnostics } from "@creatures-lsp/caos-kt/caos-validation-report";
-// Called directly against the shared parseResult below (plan/05-hover-and-
-// inlay-hints.md's core decision): getCaosInlayHints already returns
-// ready-made InlayHint[] with real positions/labels/tooltips computed by
-// caos-kt's own priority-ordered hint-provider algorithm — no
-// reimplementation. getCaosInlayOptions is read once at init() for a
-// settings UI. Note this is *not* caos-util's inlay-hints.ts wrapper (which
-// the real extension's server calls): that wrapper only adds a +1
-// position.character offset when isVsCode() is true (never true here) and
-// otherwise re-parses from raw text — calling caos-kt's function directly
-// on the parseResult we already have is the more efficient, behaviorally
-// identical choice in this non-VS-Code, shared-parse-result worker.
-import { getCaosInlayHints, getCaosInlayOptions } from "@creatures-lsp/caos-kt/caos-inlay-hints";
-// Type-only: CaosCompletionOptions/CaosCompletionSettings. The actual
-// getCompletionItems implementation used below lives in caos-util, not
-// caos-kt — see the "Engine API used" note above handleRequest's
-// "getCompletions" case for why.
-import type { CaosCompletionOptions, CaosCompletionSettings } from "@creatures-lsp/caos-kt/caos-completion";
-
-import { semanticLegend } from "@creatures-lsp/caos-util/semantics-legend";
-import { getCaosDocumentSemanticTokens } from "@creatures-lsp/caos-util/semantic-highlighter";
-import { getCompletionItems } from "@creatures-lsp/caos-util/completions";
-// getHoverItem accepts a string|CaosParseResult union, but "getHover" is a
-// standalone RPC (not folded into fullAnalysis, unlike diagnostics/
-// semantic-tokens/inlay-hints) — hover is requested on-demand at a single
-// cursor position, cheaply, rather than needing the whole-document parse
-// those other features share; so it's passed request.text directly and
-// re-parses internally rather than threading a cached parseResult through.
-import { getHoverItem } from "@creatures-lsp/caos-util/hover-documentation";
+import { useFullCaosLibDefinitions } from "@creatureslsp/caos/libsfile-full";
+import { parseCaos } from "@creatureslsp/caos/parser";
+import { caosValidationAsDiagnostics } from "@creatureslsp/caos/validation-report";
+import { getCaosInlayHintsWithOffset, getCaosInlayOptions} from "@creatureslsp/caos/inlay-hints";
+import type { CaosCompletionOptions, CaosCompletionSettings } from "@creatureslsp/caos/completions";
+import { getCompletionItems } from "@creatureslsp/caos/completions";
+import { semanticLegend } from "@creatureslsp/caos/semantics-legend";
+import { getCaosDocumentSemanticTokens } from "@creatureslsp/caos/semantic-highlighter";
+import { getHoverItem } from "@creatureslsp/caos/hover-documentation";
 
 import { CAOS_LIB_MODE } from "./lib-mode.js";
 import { beginRequest, cancelRequest, endRequest, keepGoingFor } from "./request-registry.js";

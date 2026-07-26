@@ -4,8 +4,8 @@
 // touch UX work (deciding *when* to call this) doesn't duplicate the
 // fetch/render logic (deciding *what* to show).
 import type { EditorView, Tooltip } from "@codemirror/view";
-import type { CaosEngineClient, GameVariant } from "@caos-cm6/engine";
-import { cmOffsetToLineChar } from "@caos-cm6/engine";
+import type { CaosEngineClient, GameVariant } from "@creatures-codemirror/engine";
+import { cmOffsetToLineChar } from "@creatures-codemirror/engine";
 import { renderCaosMarkdownLite } from "./markdown-lite.js";
 
 export interface ShowHoverAtOptions {

@@ -10,8 +10,8 @@
 // whether Phase 3's lint `delay` or a viewport-scoped-parse fallback
 // (parseCaosWithin) need revisiting — see the ~150ms investigate-threshold
 // proposed in plan/06-mobile-ux-and-performance.md.
-import { CaosEngineClient } from "@caos-cm6/engine";
-import type { GameVariant } from "@caos-cm6/engine";
+import { CaosEngineClient } from "@creatures-codemirror/engine";
+import type { GameVariant } from "@creatures-codemirror/engine";
 import { buildFixtures } from "./fixtures.js";
 
 const RUNS_PER_FIXTURE = 8;

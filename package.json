@@ -1,5 +1,5 @@
 {
-  "name": "caos-cm6",
+  "name": "creatures-codemirror",
   "private": true,
   "type": "module",
   "engines": {
@@ -8,7 +8,8 @@
   "scripts": {
     "test": "pnpm -r --if-present run test",
     "typecheck": "pnpm -r --if-present run typecheck",
-    "dev": "pnpm --filter @caos-cm6/demo run dev",
+    "dev": "pnpm --filter @creatures-codemirror/simple run dev",
+    "dev-demo": "pnpm --filter @creatures-codemirror/demo run dev",
     "build": "pnpm -r --if-present run build"
   },
   "devDependencies": {

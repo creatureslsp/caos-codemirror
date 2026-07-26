@@ -1,8 +1,8 @@
 // Wires @codemirror/autocomplete to the engine Worker's "getCompletions"
 // RPC (caos-util's getCompletionItems). See plan/04-autocomplete.md.
 import type { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
-import type { CaosEngineClient, GameVariant } from "@caos-cm6/engine";
-import { cmOffsetToLineChar } from "@caos-cm6/engine";
+import type { CaosEngineClient, GameVariant } from "@creatures-codemirror/engine";
+import { cmOffsetToLineChar } from "@creatures-codemirror/engine";
 import { lspCompletionItemToCM6 } from "./item-converter.js";
 
 export interface CaosCompletionSourceOptions {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Text } from "@codemirror/state";
-import type { CaosInlayHint } from "@caos-cm6/engine";
+import type { CaosInlayHint } from "@creatures-codemirror/engine";
 import { buildInlayHintDecorations } from "./build-inlay-hint-decorations.js";
 import { InlayHintWidget } from "./inlay-hint-widget.js";
 

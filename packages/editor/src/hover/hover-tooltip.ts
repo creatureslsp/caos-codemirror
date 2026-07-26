@@ -3,7 +3,7 @@
 // hints.md Part A.
 import { hoverTooltip } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
-import type { CaosEngineClient, GameVariant } from "@caos-cm6/engine";
+import type { CaosEngineClient, GameVariant } from "@creatures-codemirror/engine";
 import type { ShowHoverAtOptions } from "./touch-hover.js";
 import { showHoverAt } from "./touch-hover.js";
 

@@ -1,5 +1,5 @@
 {
-  "name": "@caos-cm6/editor",
+  "name": "@creatures-codemirror/editor",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
-    "@caos-cm6/engine": "workspace:*",
+    "@creatures-codemirror/engine": "workspace:*",
     "@codemirror/autocomplete": "^6.20.3",
     "@codemirror/language": "^6.12.4",
     "@codemirror/lint": "^6.9.7",

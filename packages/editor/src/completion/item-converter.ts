@@ -21,7 +21,7 @@ import type { Text } from "@codemirror/state";
 import type { Completion } from "@codemirror/autocomplete";
 import { snippet } from "@codemirror/autocomplete";
 import { CompletionItemKind, InsertTextFormat, type CompletionItem } from "vscode-languageserver-types";
-import { lineCharToCmOffset } from "@caos-cm6/engine";
+import { lineCharToCmOffset } from "@creatures-codemirror/engine";
 
 const KIND_TO_TYPE: Partial<Record<CompletionItemKind, string>> = {
   [CompletionItemKind.Text]: "text",

@@ -6,7 +6,7 @@
 // guards), plus reacting to live inlay-hint-option changes.
 import { StateEffect, StateField, type Extension } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin, type DecorationSet, type ViewUpdate } from "@codemirror/view";
-import { CancelledError, type CaosEngineClient, type GameVariant } from "@caos-cm6/engine";
+import { CancelledError, type CaosEngineClient, type GameVariant } from "@creatures-codemirror/engine";
 import { buildInlayHintDecorations } from "./build-inlay-hint-decorations.js";
 import { inlayHintOptionsField } from "./inlay-hint-options.js";
 

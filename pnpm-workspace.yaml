@@ -3,3 +3,7 @@ packages:
   - "apps/*"
 allowBuilds:
   esbuild: true
+minimumReleaseAgeExclude:
+  - '@creatureslsp/caos-kt@0.0.2'
+  - '@creatureslsp/caos@0.0.2'
+  - '@creatureslsp/extension-util@0.0.2'

@@ -2,9 +2,7 @@
 // Plain types/interfaces only — no runtime dependency on either side, and no
 // value imports from "@creatures-lsp/caos-kt" (only erased type-only ones).
 import type { GameVariant } from "../shared/variant.js";
-// Type-only import, erased at compile time — safe per risk #2 (only value
-// imports of the bare "@creatures-lsp/caos-kt" specifier are unsafe).
-import type { Diagnostic as CaosDiagnostic } from "@creatures-lsp/caos-kt/caos-validation-report";
+import type { Diagnostic as CaosDiagnostic } from "@creatureslsp/caos/validation-report";
 export type { CaosDiagnostic };
 // vscode-languageserver-types is a real dependency (not the bare caos-kt/
 // caos-util specifier risk #2 warns about) — a pure-ESM, browser-safe types

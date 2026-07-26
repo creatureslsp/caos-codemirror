@@ -1,5 +1,5 @@
 {
-  "name": "@caos-cm6/engine",
+  "name": "@creatures-codemirror/engine",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -16,8 +16,7 @@
   },
   "dependencies": {
     "@codemirror/state": "^6.4.1",
-    "@creatures-lsp/caos-kt": "link:../../../vs-caos-editor/packages/caos-kt",
-    "@creatures-lsp/caos-util": "link:../../../vs-caos-editor/packages/caos-util",
+    "@creatureslsp/caos": "0.0.2",
     "vscode-languageserver-types": "^3.18.0"
   },
   "devDependencies": {

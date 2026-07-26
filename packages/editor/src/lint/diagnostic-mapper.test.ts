@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Text } from "@codemirror/state";
-import type { CaosDiagnostic } from "@caos-cm6/engine";
+import type { CaosDiagnostic } from "@creatures-codemirror/engine";
 import { toCM6Diagnostic } from "./diagnostic-mapper.js";
 
 // Minimal structural fixture — this package never imports caos-kt directly

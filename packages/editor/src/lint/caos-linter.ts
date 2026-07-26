@@ -4,7 +4,7 @@
 import { linter, type Diagnostic as CM6Diagnostic, type LintSource } from "@codemirror/lint";
 import { EditorView } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
-import { CancelledError, type CaosEngineClient, type GameVariant } from "@caos-cm6/engine";
+import { CancelledError, type CaosEngineClient, type GameVariant } from "@creatures-codemirror/engine";
 import { toCM6Diagnostic } from "./diagnostic-mapper.js";
 
 export interface CaosLinterOptions {

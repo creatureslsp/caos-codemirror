@@ -1,8 +1,8 @@
 import { basicSetup, EditorView } from "codemirror";
 import { Compartment, EditorState } from "@codemirror/state";
 import { diagnosticCount, lintGutter } from "@codemirror/lint";
-import type { GameVariant } from "@caos-cm6/engine";
-import { CaosEngineClient, chooseEngineLoadTiming, scheduleEngineLoad } from "@caos-cm6/engine";
+import type { GameVariant } from "@creatures-codemirror/engine";
+import { CaosEngineClient, chooseEngineLoadTiming, scheduleEngineLoad } from "@creatures-codemirror/engine";
 import {
   caosCompletion,
   caosHoverTooltip,
@@ -19,7 +19,7 @@ import {
   setInlayHintOptions,
   touchTheme,
   type InlayHintOptions,
-} from "@caos-cm6/editor";
+} from "@creatures-codemirror/editor";
 import { createVariantPicker } from "./variant-picker.js";
 import { createCaosPanel } from "./panel.js";
 

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { Text } from "@codemirror/state";
 import { adjustForIndexing, cmOffsetToLineChar, lineCharToCmOffset } from "./positions.js";
-import { useFullCaosLibDefinitions } from "@creatures-lsp/caos-kt/caos-libsfile-full";
-import { caosValidationAsDiagnostics } from "@creatures-lsp/caos-kt/caos-validation-report";
+import { useFullCaosLibDefinitions } from "@creatureslsp/caos/libsfile-full";
+import { caosValidationAsDiagnostics } from "@creatureslsp/caos/validation-report";
 
 // No caosInitLib() here — see caos.worker.ts's import-discipline comment:
 // it's an orphaned, unexported build artifact in caos-kt's dist/. Calling

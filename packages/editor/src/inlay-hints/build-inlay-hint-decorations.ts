@@ -5,8 +5,8 @@
 import type { Text } from "@codemirror/state";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, type DecorationSet } from "@codemirror/view";
-import type { CaosInlayHint } from "@caos-cm6/engine";
-import { lineCharToCmOffset } from "@caos-cm6/engine";
+import type { CaosInlayHint } from "@creatures-codemirror/engine";
+import { lineCharToCmOffset } from "@creatures-codemirror/engine";
 import { InlayHintWidget } from "./inlay-hint-widget.js";
 
 function labelText(label: CaosInlayHint["label"]): string {
