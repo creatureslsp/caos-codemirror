@@ -87,6 +87,75 @@
       .panel-checkbox-row { display: block; font-size: 13px; margin-bottom: 2px; }
       .panel-min-param-row { display: block; margin-top: 8px; font-size: 13px; }
       .panel-min-param-row input { width: 4rem; }
+
+      .file-browser { border-bottom: 1px solid #ddd; padding-bottom: 12px; margin-bottom: 12px; }
+      .file-browser-toolbar { display: flex; gap: 8px; margin-bottom: 8px; }
+      .files-search-bar { flex: 1; min-width: 0; }
+      .file-browser-file-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+
+      .files-project-switcher { margin-bottom: 8px; }
+      .files-project-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+      .files-project-chip {
+        border: 1px solid #ccc;
+        border-radius: 999px;
+        background: #f2f2f2;
+        color: #111;
+        padding: 4px 10px;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .files-project-chip--active { background: #222; color: #fff; border-color: #222; }
+      .files-project-delete { opacity: 0.6; font-weight: bold; }
+      .files-project-delete:hover { opacity: 1; }
+      .files-project-create-button { font-size: 13px; }
+      .files-project-create-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+      .files-list { list-style: none; margin: 0; padding: 0; }
+      .files-empty { font-size: 13px; opacity: 0.7; }
+      .files-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .files-row--active { background: #f5f8ff; }
+      .files-row-name { flex: 1; min-width: 100%; text-align: left; background: none; border: none; padding: 0; }
+      .files-row-meta { display: block; font-size: 11px; opacity: 0.65; }
+      .files-row-actions { display: flex; flex-wrap: wrap; gap: 4px; font-size: 12px; }
+      .files-row-variant-select { font-size: 12px; }
+      .files-row-move { flex-basis: 100%; }
+
+      .files-trash-toggle { font-size: 13px; margin-top: 8px; }
+      .files-trash-list { list-style: none; margin: 8px 0 0; padding: 0; }
+
+      .files-dialog-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        box-sizing: border-box;
+      }
+      .files-dialog {
+        background: #fff;
+        color: #111;
+        border-radius: 8px;
+        padding: 16px;
+        max-width: 360px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .files-dialog h3 { margin-top: 0; }
+      .files-dialog-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+      .files-dialog-actions--stacked { flex-direction: column; align-items: stretch; }
+      .files-dialog-move-row { display: flex; gap: 8px; margin-top: 4px; }
     </style>
   </head>
   <body>

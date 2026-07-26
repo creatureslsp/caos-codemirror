@@ -13,11 +13,13 @@ opens a slide-over sheet containing a **Variant** picker (`GameVariant`:
 C1/C2/CV/C3/DS/DS:CE/SM), a status panel (live diagnostics count,
 hover/completion status, inlay-hint category checkboxes +
 `minimumParameterCount` control), and a **Show log**/**Hide log** toggle for
-the (hidden-by-default) log pane. There is currently no in-app fixture
-picker — `fixtures/empty.cos` is the only document loaded (Phase 03 adds
-real file management); to exercise the scenarios below that need specific
-fixture content, paste it into the editor manually or temporarily point
-`main.ts`'s `FIXTURES` at `apps/demo/fixtures/*.cos`.
+the (hidden-by-default) log pane. The sheet's primary content is now the
+Phase 03 file/project browser (project chips, search/sort, file list,
+trash), followed by the Variant picker and status panel. There is still no
+fixture picker distinct from real file management — to exercise the
+scenarios below that need specific fixture content, paste it into the
+editor manually, use "Open from disk…" on a local copy of a fixture, or
+temporarily point `main.ts`'s `FIXTURES` at `apps/demo/fixtures/*.cos`.
 
 ## Shell (Phase 01)
 
@@ -37,6 +39,54 @@ fixture content, paste it into the editor manually or temporarily point
       (shifts above the log pane rather than being covered by it).
 - [ ] Variant picker and status panel inside the sheet behave exactly as
       before the Preact port (see "Golden path"/"Variant behavior" below).
+
+## File & project management (Phase 03)
+
+- [ ] Menu sheet's primary content is the file browser (search bar, sort
+      control, project chips with Root always present, file-action buttons,
+      file list, trash toggle) — no element intercepts taps (watch for
+      CodeMirror's `.cm-panels-bottom` z-index issue, fact #8).
+- [ ] Create a project (name + variant); it appears as a chip; tapping it
+      switches the file list to that project's scope (empty state shown for
+      a fresh project).
+- [ ] Create a file via "+ New file" inside a project (inherits the
+      project's variant, shown as `Inherit (<variant>)` in its row's variant
+      select) and at root (prompts for an explicit variant first, since root
+      has nothing to inherit from).
+- [ ] Tapping a file row loads its text into the editor; if its effective
+      variant differs from the current picker value, the picker updates to
+      match and re-validates.
+- [ ] Rename a file to collide with another file in the same project scope:
+      the stop/rename/overwrite dialog appears; verify all three choices
+      (Cancel leaves both files unchanged; Rename lets you pick a different
+      new name and retries; Overwrite replaces the existing file and keeps
+      the new name).
+- [ ] Move a file into another project: if its variant matched the
+      *destination* project's variant it folds to "inherit"; otherwise it
+      keeps its explicit variant. Move a file to root: a `null` (inherited)
+      variant resolves to its former parent project's concrete variant.
+- [ ] Delete an **empty** project: no prompt, it's immediately trashed.
+- [ ] Delete a **non-empty** project: the cascade dialog appears with all
+      three strategies (delete-all, move-to-root, move-to-another-project);
+      verify each leaves the right end state (files trashed alongside the
+      project / files at root / files in the chosen project, colliding names
+      auto-suffixed `" (2)"`, `" (3)"`, …).
+- [ ] Trash view lists both trashed files and trashed projects; restoring a
+      file and a project both work and the restored item reappears in its
+      original scope.
+- [ ] Search (mixed-case/diacritic/punctuated queries) narrows both the
+      project chips and the active project's file list in place, without
+      navigating away.
+- [ ] Sort by each of name/created/modified, both directions, for both
+      projects and files.
+- [ ] "Open from disk…" loads a local `.cos` file's content into a new file
+      row (prompting for a variant first if opening into root) and into the
+      editor; "Download current file" downloads the live editor content
+      (not last-saved content) named after the active file with `.cos`
+      appended.
+- [ ] The "files are stored only in this browser" warning appears exactly
+      once ever (first successful create/open-from-disk across the app's
+      lifetime, persisted via the `kv` store — not once per session).
 
 ## Golden path
 
