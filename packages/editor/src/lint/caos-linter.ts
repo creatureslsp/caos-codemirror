@@ -1,6 +1,4 @@
-// Wires @codemirror/lint to the engine Worker's fullAnalysis RPC, mapping
-// caos-kt's Diagnostic[] to CM6 lint Diagnostic[] via diagnostic-mapper.ts.
-// See plan/03-validation-diagnostics.md.
+// Wires @codemirror/lint to the engine Worker's fullAnalysis RPC.
 import { linter, type Diagnostic as CM6Diagnostic, type LintSource } from "@codemirror/lint";
 import { EditorView } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
@@ -10,11 +8,7 @@ import { toCM6Diagnostic } from "./diagnostic-mapper.js";
 export interface CaosLinterOptions {
   client: CaosEngineClient;
   getVariant: () => GameVariant;
-  /** Time to wait after the last edit before linting (@codemirror/lint's own
-   * debounce). Independent of Layer 2's semantic-token debounce, but both
-   * ultimately share one worker round trip per unchanged document via
-   * CaosEngineClient.fullAnalysis's own content-keyed memoization (risk #7)
-   * rather than double-parsing. */
+  /** Time to wait after the last edit before linting. */
   delay?: number;
 }
 

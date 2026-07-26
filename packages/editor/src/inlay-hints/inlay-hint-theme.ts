@@ -1,8 +1,5 @@
-// Muted/parenthetical pill styling for InlayHintWidget's
-// <span class="cm-caos-inlay-hint">, matching the VS Code extension's
-// inlay-hint look (plan/05-hover-and-inlay-hints.md). Same CSS-custom-
-// property-with-fallback pattern as ../semantic/semantic-tokens-theme.ts so
-// a host app can restyle without forking this file.
+// Base theme for inlay hints styling.
+// A host app can restyle without forking this file.
 import { EditorView } from "@codemirror/view";
 
 export const inlayHintTheme = EditorView.baseTheme({

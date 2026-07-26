@@ -1,8 +1,4 @@
-// A <select> for GameVariant, used to drive apps/demo/src/main.ts's
-// Compartment-based reconfiguration (plan/07-demo-app-and-verification.md's
-// "Variant behavior" checklist section): switching variants should
-// re-validate and change completion/hint results without recreating the
-// whole EditorView.
+/** Selector element for choosing a GameVariant. */
 import type { GameVariant } from "@creatures-codemirror/engine";
 import { GAME_VARIANTS } from "@creatures-codemirror/engine";
 

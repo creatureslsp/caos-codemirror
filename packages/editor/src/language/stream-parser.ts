@@ -1,25 +1,4 @@
-// Layer 1 of the two-layer highlighting design (plan/02-syntax-highlighting.md):
-// an instant, synchronous StreamLanguage tokenizer hand-ported rule-by-rule
-// from vs-caos-editor/syntaxes/CAOS.tmLanguage.json, giving zero-latency
-// baseline coloring before the worker's real parse/semantic-token pass
-// (Layer 2, see ../semantic/semantic-tokens-plugin.ts) resolves.
-//
-// This tokenizer is deliberately approximate, not a real CAOS parser: it
-// classifies tokens the way the TextMate grammar did — by shape and
-// regexes, with no knowledge of the actual command library, variant, or
-// argument types. Two constructs are genuinely unresolvable at this layer
-// and are intentionally left coarse:
-//   - `[`/`]` bracket content (C1e bracket-strings vs. byte-strings) is
-//     tokenized uniformly as `caosTags.string` here; which one it actually
-//     is depends on the preceding command, which only the real parser
-//     knows (see docs/vs-caos-editor-architecture.md). Layer 2 supplies the
-//     correct distinction once semantic tokens resolve.
-//   - Any bare 4-letter token not otherwise classified (comments, strings,
-//     keywords, operators) is tokenized as `caosTags.commandHeuristic`,
-//     styled *duller* than Layer 2's confirmed command/rvalue/lvalue color
-//     in highlight-style.ts. This is the mechanism — not a bug — behind why
-//     the same token class has two color intensities: instant rough
-//     coloring that visually "sharpens" once semantic tokens arrive.
+// Synchronous StreamLanguage tokenizer for baseline CAOS syntax highlighting (Layer 1).
 import type { StreamParser, StringStream } from "@codemirror/language";
 import { caosTags, type CaosTokenName } from "./caos-tags.js";
 
@@ -34,15 +13,11 @@ export interface CaosStreamState {
    * line — these directives never span lines, matching the tmLanguage
    * rule's own `(?=\n|$)` end anchor. */
   inCaos2Directive: boolean;
-  /** Inside an opened, unclosed `"…"` string. Reset every line — CAOS
-   * strings don't span lines (plan/02, Layer 1 spec). */
+  /** Inside an opened, unclosed `"…"` string. Reset every line. */
   inQuoteString: boolean;
-  /** Inside an opened, unclosed `[…]` bracket/byte-string span. Reset every
-   * line for the same reason as inQuoteString. */
+  /** Inside an opened, unclosed `[…]` bracket/byte-string span. Reset every line. */
   inBracketString: boolean;
-  /** True immediately after tokenizing a SUBR or GSUB keyword — the next
-   * word token on the same line is the subroutine name, tagged
-   * `labelName` regardless of its own shape. */
+  /** True immediately after tokenizing a SUBR or GSUB keyword. */
   afterLabelKeyword: boolean;
 }
 
@@ -54,9 +29,6 @@ function freshLineState(state: CaosStreamState): void {
   state.afterLabelKeyword = false;
 }
 
-// Ported from tmLanguage's "doif"/"enum"/"scrp"/"loop"/"repe"/"retn" rules
-// plus subr_header's begin capture (also keyword.control.caos there) —
-// flattened into one set per plan/02's "Keyword-pair block words" bullet.
 const CONTROL_KEYWORDS = new Set([
   "doif", "elif", "else", "endi",
   "reps", "repe",
@@ -65,11 +37,8 @@ const CONTROL_KEYWORDS = new Set([
   "etch", "esee", "epas", "econ", "elst", "escn", "nscn",
 ]);
 
-// Ported from tmLanguage's "equality" rule (textual + symbolic spellings).
 const COMPARE_WORDS = new Set(["eq", "ne", "gt", "ge", "lt", "le", "bt", "bf", "and", "or"]);
 
-// Ported from tmLanguage's "commands" rule:
-// [a-zA-Z$_][a-zA-Z$_+0-9]{2}[a-zA-Z_+0-9:] — always exactly 4 characters.
 const COMMAND_SHAPE = /^[a-zA-Z_$][a-zA-Z0-9_$+]{2}[a-zA-Z0-9_+:]$/;
 
 function classifyWord(word: string, state: CaosStreamState): CaosTokenName | null {
@@ -89,8 +58,6 @@ function classifyWord(word: string, state: CaosStreamState): CaosTokenName | nul
     tag = null;
   }
 
-  // SUBR's/GSUB's own word is classified above (controlKeyword /
-  // commandHeuristic respectively); this just arms the *next* word.
   if (lower === "subr" || lower === "gsub") {
     state.afterLabelKeyword = true;
   }
@@ -105,8 +72,6 @@ function quoteStringToken(stream: StringStream, state: CaosStreamState): CaosTok
   }
   if (stream.match(/^\\./)) return "escape";
   if (stream.match(/^[^"\\\n]+/)) return "string";
-  // Unreachable in practice (sol() resets the state before this could fire
-  // at end-of-line), but guarantees forward progress regardless.
   stream.next();
   return "string";
 }
@@ -121,10 +86,6 @@ function bracketStringToken(stream: StringStream, state: CaosStreamState): CaosT
   return "string";
 }
 
-// caos2value's three sub-patterns (quoted / signed-int / bareword) all
-// collapse to one "value" tag here per plan/02's coarse 3-way mapping
-// (key/=/value -> processingInstruction/propertyName/string) — see
-// caos-tags.ts.
 function caos2DirectiveToken(stream: StringStream, state: CaosStreamState): CaosTokenName | null {
   if (stream.match(/^=/)) return "caos2Eq";
   if (stream.match(/^"(?:\\.|[^"\\\n])*"?/)) return "string";

@@ -1,14 +1,4 @@
-// Larger touch targets for autocomplete/hover on mobile
-// (plan/06-mobile-ux-and-performance.md). Selectors below are
-// @codemirror/autocomplete's real, undocumented-but-stable DOM class names
-// (verified against its source, same approach as ../semantic/semantic-
-// tokens-theme.ts's legend-name verification) — there's no public "make
-// this touch-friendly" option to configure instead.
-//
-// Applied unconditionally (no pointer:coarse media-query gate): a taller
-// row/larger tap target costs nothing on desktop and pointer-capability
-// media queries are an imperfect proxy for "this session is on mobile"
-// (hybrid touch+mouse laptops, etc).
+// Touch-friendly target styling for autocomplete popups and hover tooltips.
 import { EditorView } from "@codemirror/view";
 
 const MIN_TOUCH_TARGET_PX = 44;

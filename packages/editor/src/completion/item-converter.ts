@@ -1,22 +1,4 @@
-// Converts caos-util's LSP-shaped CompletionItem (returned by the worker's
-// "getCompletions" RPC, see plan/04-autocomplete.md) to CM6's Completion.
-//
-// Verified against the actual completion-item builders in
-// vs-caos-editor/packages/caos-util/src/completion/*.ts before writing this
-// file (not just the plan doc's description of them):
-//   - `documentation` is always a plain-text command/value description
-//     (e.g. `command.description` assigned directly in
-//     command-to-completion-item.ts), never markdown — formatCaosDocumentation
-//     (documentation-formattter.ts), which *does* produce markdown, is only
-//     used by the extension's hover path, not completions. So `info` below
-//     renders plain text, not markdown — there is no shared markdown-lite
-//     renderer to reuse here (Phase 5's hover will need one; it has nothing
-//     to do with this file).
-//   - Only multi-word commands (getMultiTokenCommands in
-//     completion.command.ts) carry a `textEdit`; everything else
-//     (single-word commands, bitflag/values-list/lvalue/rvalue items) relies
-//     on plain `insertText`, so `from`/`to` for those come from the
-//     completion source's own word-match instead.
+// Converts LSP-shaped CompletionItems from the engine Worker to CM6 Completions.
 import type { Text } from "@codemirror/state";
 import type { Completion } from "@codemirror/autocomplete";
 import { snippet } from "@codemirror/autocomplete";
@@ -55,23 +37,14 @@ function kindToType(kind: CompletionItem["kind"]): string | undefined {
   return kind == null ? undefined : KIND_TO_TYPE[kind];
 }
 
-/** Best-effort only (plan/04-autocomplete.md's accepted parity gap): the
- * only real signal in caos-kt's sortText scheme is the 'a_'/'b_' prefix
- * getCommandCompletionsForCommandType adds for return-type-matching
- * (completion.command.ts) — every other sortText uses a constant numeric
- * prefix that carries no real ordering information, so isn't worth parsing. */
+/** Adjust completion score based on sortText prefix. */
 function boostFor(sortText: string | undefined): number | undefined {
   if (sortText?.startsWith("a_")) return 1;
   if (sortText?.startsWith("b_")) return -1;
   return undefined;
 }
 
-/** LSP tabstop syntax `${1:name:type}` (or bare `${1}`) → CM6 snippet syntax
- * `${name:type}` (or `${}`) — strips the leading numeric tabstop index,
- * keeping only the placeholder text (plan/04-autocomplete.md: two
- * parameters sharing a placeholder name become linked/mirrored tabstops in
- * CM6's model; accepted as low-risk since CAOS parameter names are
- * typically distinct). */
+/** Converts LSP snippet syntax to CM6 snippet syntax. */
 function lspSnippetToCM6(insertText: string): string {
   return insertText.replace(/\$\{\d+(?::([^}]*))?\}/g, (_match, text: string | undefined) => `\${${text ?? ""}}`);
 }

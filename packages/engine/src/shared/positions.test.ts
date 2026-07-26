@@ -4,10 +4,7 @@ import { adjustForIndexing, cmOffsetToLineChar, lineCharToCmOffset } from "./pos
 import { useFullCaosLibDefinitions } from "@creatureslsp/caos/libsfile-full";
 import { caosValidationAsDiagnostics } from "@creatureslsp/caos/validation-report";
 
-// No caosInitLib() here — see caos.worker.ts's import-discipline comment:
-// it's an orphaned, unexported build artifact in caos-kt's dist/. Calling
-// useFullCaosLibDefinitions() directly is what caosInitLib() would have
-// done anyway, guarded.
+// Cross-checks against real caos-kt line/offset output.
 useFullCaosLibDefinitions();
 
 describe("cmOffsetToLineChar / lineCharToCmOffset", () => {
@@ -75,9 +72,7 @@ describe("adjustForIndexing", () => {
   });
 });
 
-// Empirical cross-check against real caos-kt output (risk #4's "needs spike"
-// items) rather than assuming behavior — see positions.ts's header comment
-// for what these confirmed.
+// Empirical cross-check against real caos-kt output
 describe("caos-kt line/offset conventions (empirical, guards against upstream drift)", () => {
   it("treats \\r\\n as one 2-char line boundary, matching CM6's Text", () => {
     const text = "zzzz\r\nzzzz\r\nzzzz"; // "zzzz" is not a real CAOS command -> diagnostics

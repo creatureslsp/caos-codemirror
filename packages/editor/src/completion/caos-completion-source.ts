@@ -1,5 +1,4 @@
-// Wires @codemirror/autocomplete to the engine Worker's "getCompletions"
-// RPC (caos-util's getCompletionItems). See plan/04-autocomplete.md.
+// Wires @codemirror/autocomplete to the engine Worker's completion RPC.
 import type { CompletionContext, CompletionResult } from "@codemirror/autocomplete";
 import type { CaosEngineClient, GameVariant } from "@creatures-codemirror/engine";
 import { cmOffsetToLineChar } from "@creatures-codemirror/engine";
@@ -10,8 +9,6 @@ export interface CaosCompletionSourceOptions {
   getVariant: () => GameVariant;
 }
 
-// Matches the plan's suggested pattern: CAOS identifiers plus ':' (used in
-// multi-word command spellings like "dde: get" and in variable-ish tokens).
 const WORD_PATTERN = /[A-Za-z_:][A-Za-z0-9_:]*/;
 
 export function caosCompletionSource(options: CaosCompletionSourceOptions) {
@@ -26,11 +23,6 @@ export function caosCompletionSource(options: CaosCompletionSourceOptions) {
     const text = context.state.doc.toString();
     const { line, character } = cmOffsetToLineChar(context.state.doc, context.pos);
 
-    // Deliberately never debounced (risk #7) — fires on every CM6-triggered
-    // keystroke, relying on the worker's cheap parseCaosNear path to stay
-    // fast. Rejections (cancelled/stale-revision/worker error) are treated
-    // the same as "nothing to show" here, unlike the linter's rethrow —
-    // there's no prior completion popup state worth preserving on a miss.
     let response;
     try {
       response = await client.getCompletions(variant, text, line, character);

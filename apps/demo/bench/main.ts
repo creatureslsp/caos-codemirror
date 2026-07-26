@@ -1,15 +1,4 @@
-// Benchmark harness for CaosEngineClient.fullAnalysis round-trip latency
-// (plan/06-mobile-ux-and-performance.md's verification item 4). This is a
-// standalone page, not part of the main demo — open it directly
-// (apps/demo/bench/index.html via `pnpm dev`, or the built bench/ output),
-// optionally with Chrome DevTools' Performance panel CPU-throttling
-// presets enabled first, to approximate low-end mobile hardware.
-//
-// Recorded numbers from an actual run, not a subjective "feels fine", are
-// this phase's deliverable evidence (plan/06 verification item 4) for
-// whether Phase 3's lint `delay` or a viewport-scoped-parse fallback
-// (parseCaosWithin) need revisiting — see the ~150ms investigate-threshold
-// proposed in plan/06-mobile-ux-and-performance.md.
+// Benchmark harness for CaosEngineClient.fullAnalysis round-trip latency.
 import { CaosEngineClient } from "@creatures-codemirror/engine";
 import type { GameVariant } from "@creatures-codemirror/engine";
 import { buildFixtures } from "./fixtures.js";
@@ -18,12 +7,7 @@ const RUNS_PER_FIXTURE = 8;
 const VARIANT: GameVariant = "DS";
 
 function withEditMarker(text: string, iteration: number): string {
-  // A trailing edit-marker comment makes each iteration's text unique, so
-  // every call is a real worker round trip rather than a same-content hit
-  // against CaosEngineClient's memoization cache (plan/00 risk #7) — this
-  // benchmark is meant to measure the realistic "small edit, re-analyze"
-  // cost a linter/semantic-tokens debounce actually pays, not a cache hit
-  // masquerading as one.
+  // A trailing edit-marker comment makes each iteration's text unique.
   return `${text}* run ${iteration}\n`;
 }
 

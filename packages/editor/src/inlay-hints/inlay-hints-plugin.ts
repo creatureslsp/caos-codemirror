@@ -1,9 +1,4 @@
-// Debounced ViewPlugin driving the worker's fullAnalysis RPC for its
-// inlayHints field, rendered as a DecorationSet via
-// build-inlay-hint-decorations.ts. See plan/05-hover-and-inlay-hints.md
-// Part B. Structurally mirrors ../semantic/semantic-tokens-plugin.ts (same
-// retain-last-known-good-on-error, revision-drop, and doc-hasn't-moved-on
-// guards), plus reacting to live inlay-hint-option changes.
+// ViewPlugin managing inlay hint analysis requests and decoration updates.
 import { StateEffect, StateField, type Extension } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin, type DecorationSet, type ViewUpdate } from "@codemirror/view";
 import { CancelledError, type CaosEngineClient, type GameVariant } from "@creatures-codemirror/engine";
@@ -18,8 +13,8 @@ const inlayHintDecorationsField = StateField.define<DecorationSet>({
   },
   update(decorations, tr) {
     // Retain the last-known-good set across doc edits while a fresh
-    // response is in flight, same rationale as semantic-tokens-plugin.ts's
-    // field (risk #5 — never flash to empty on every keystroke).
+    // response is in flight. Map through position changes so existing
+    // decorations keep tracking edits until the fresh response arrives.
     let next = decorations.map(tr.changes);
     for (const effect of tr.effects) {
       if (effect.is(setInlayHintDecorations)) next = effect.value;

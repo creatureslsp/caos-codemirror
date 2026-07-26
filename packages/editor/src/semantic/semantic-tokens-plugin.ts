@@ -1,8 +1,4 @@
-// Layer 2 of the two-layer highlighting design (plan/02-syntax-
-// highlighting.md): on debounced doc updates, sends the document to the
-// engine Worker's fullAnalysis RPC and renders its semanticTokensData as an
-// overlay DecorationSet (../semantic/semantic-tokens-theme.ts supplies the
-// CSS). See ../language/stream-parser.ts for Layer 1.
+// Layer 2 semantic highlighting ViewPlugin. Renders semantic tokens as an overlay DecorationSet.
 import { StateEffect, StateField, type Extension } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin, type DecorationSet, type ViewUpdate } from "@codemirror/view";
 import { CancelledError, type CaosEngineClient, type GameVariant } from "@creatures-codemirror/engine";
@@ -17,8 +13,7 @@ const semanticTokensField = StateField.define<DecorationSet>({
   },
   update(decorations, tr) {
     // Retain the last-known-good set across doc edits while a new request
-    // is in flight (risk #5 — never clear to empty; that would flash-to-
-    // blank on every keystroke). Map through position changes so existing
+    // is in flight. Map through position changes so existing
     // decorations keep tracking edits until the fresh response arrives.
     let next = decorations.map(tr.changes);
     for (const effect of tr.effects) {
@@ -54,10 +49,7 @@ function analysisDriver(options: SemanticTokensPluginOptions) {
   return ViewPlugin.fromClass(
     class {
       private timer: ReturnType<typeof setTimeout> | undefined;
-      // Comparing the worker's raw encoded data is cheaper than diffing
-      // built decorations, and is exactly "the semantic result hasn't
-      // actually changed" from plan/02's reconciliation note — skips
-      // rebuilding decorations and dispatching entirely when nothing did.
+      // Skip rebuilding decorations when data hasn't changed.
       private lastData: number[] | null = null;
 
       constructor(private view: EditorView) {

@@ -1,12 +1,8 @@
-// Sidebar panel (plan/07-demo-app-and-verification.md): visibly shows the
-// current diagnostics count, hover/completion feature status, and the
-// inlay-hint category checkboxes/minimumParameterCount control — so the
-// manual test checklist has something concrete to look at rather than
-// wiring these features silently.
+/** Sidebar status panel. */
 import type { InlayHintOptions } from "@creatures-codemirror/editor";
 
 export interface CaosPanelOptions {
-  /** Provider ids from InitResponse.inlayHintOptions (getCaosInlayOptions()). */
+  /** Provider ids from InitResponse.inlayHintOptions. */
   inlayHintOptionIds: string[];
   initialInlayHintOptions: InlayHintOptions;
   onInlayHintOptionsChange: (options: InlayHintOptions) => void;

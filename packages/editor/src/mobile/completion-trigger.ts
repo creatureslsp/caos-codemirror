@@ -1,10 +1,4 @@
-// A visible manual "trigger completion" button (plan/06-mobile-ux-and-
-// performance.md) — there's no Ctrl+Space on a touch keyboard, so without
-// this, autocomplete on mobile is reachable only by typing enough of a
-// word for the default activateOnTyping trigger to fire. Implemented as a
-// bottom Panel (not a fixed-position element the host app has to place
-// itself), wired straight to @codemirror/autocomplete's own startCompletion
-// command — no reimplementation of what "start completion" means.
+// Adds a manual completion trigger button panel for touch environments.
 import { showPanel } from "@codemirror/view";
 import type { EditorView, Panel } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";

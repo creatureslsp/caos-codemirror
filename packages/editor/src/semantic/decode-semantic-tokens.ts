@@ -1,10 +1,4 @@
-// Decodes the flat LSP semantic-token delta encoding produced by
-// convertContext() in vs-caos-editor/packages/caos-util/src/
-// semantic-highlighter.ts: a sequence of
-// [deltaLine, deltaStartCharOrAbsolute, tokenLength, typeIndex,
-// modifierBitmask] quintuples, sorted by position, where deltaStartChar
-// resets to an absolute character offset whenever the line changes (plan/
-// 02-syntax-highlighting.md, "Decoding").
+// Decodes the flat LSP semantic-token delta encoding into position-based tokens.
 import type { SemanticTokensLegend } from "./legend.js";
 
 export interface DecodedSemanticToken {
@@ -42,10 +36,7 @@ export function decodeSemanticTokens(data: readonly number[]): DecodedSemanticTo
   return tokens;
 }
 
-/** CSS classes for a decoded token: `cm-caos-sem-<type>` plus one
- * `cm-caos-mod-<modifier>` per set bit, per plan/02's "Decoding" section
- * (legend indices from risk #10's verified list — read from the real
- * legend at runtime, not hardcoded). */
+/** Returns CSS classes for a decoded token (`cm-caos-sem-<type>` and `cm-caos-mod-<modifier>`). */
 export function classNamesFor(token: DecodedSemanticToken, legend: SemanticTokensLegend): string[] {
   const classes: string[] = [];
   const typeName = legend.tokenTypes[token.typeIndex];

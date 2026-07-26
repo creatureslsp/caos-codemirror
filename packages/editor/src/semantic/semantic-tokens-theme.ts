@@ -1,14 +1,4 @@
-// Additive/overlay styling for Layer 2 (plan/02-syntax-highlighting.md,
-// "Reconciliation with Layer 1" — risk #5): these classes never replace
-// Layer 1's StreamLanguage base color (../language/highlight-style.ts),
-// only layer modifier/identity classes on top via normal CSS cascade, not
-// !important overrides. Register this extension after caosLanguageSupport()
-// so its rules cascade after Layer 1's for any overlapping span.
-//
-// Colors are exposed as CSS custom properties (--caos-<type>[-dark]) with
-// fallbacks, so a host app can override them to match its own design
-// system without forking this stylesheet. Type names are the real,
-// code-verified legend (plan/00-risks-and-verified-facts.md risk #10).
+// Base theme exposing CSS custom properties for Layer 2 semantic token styles.
 import { EditorView } from "@codemirror/view";
 
 export const semanticTokensTheme = EditorView.baseTheme({
@@ -74,11 +64,7 @@ export const semanticTokensTheme = EditorView.baseTheme({
   ".cm-caos-sem-number": { color: "var(--caos-number, #0550ae)" },
   "&dark .cm-caos-sem-number": { color: "var(--caos-number-dark, #79c0ff)" },
 
-  // Modifiers — additive, layered on top of the type color above. Only
-  // "not-found" gets dedicated styling in Phase 2 (it's the plan's own
-  // verification target: "a red squiggle-equivalent under an unknown
-  // command"); the rest are available as bare classes for later phases/
-  // host apps to hook without needing a stream-parser.ts change.
+  // Modifiers — additive, layered on top of the type color above.
   ".cm-caos-mod-not-found": {
     textDecoration: "underline wavy var(--caos-error, #cf222e)",
   },

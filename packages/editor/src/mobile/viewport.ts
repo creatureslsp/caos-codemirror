@@ -1,10 +1,4 @@
-// Keeps the editor, its caret, and any open tooltip/autocomplete popup
-// visible above the on-screen virtual keyboard on mobile browsers
-// (plan/06-mobile-ux-and-performance.md). Desktop browsers rarely resize
-// window.visualViewport in a way that changes any of the numbers below, so
-// this extension is a safe no-op there without a UA check, and degrades to
-// a true no-op (not an error) in environments with no visualViewport at
-// all (e.g. under Node during SSR/tests).
+// Keeps the editor and popups visible above virtual keyboards on mobile browsers.
 import { EditorView, ViewPlugin, repositionTooltips } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
 

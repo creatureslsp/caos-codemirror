@@ -4,10 +4,7 @@ import type { CaosInlayHint } from "@creatures-codemirror/engine";
 import { buildInlayHintDecorations } from "./build-inlay-hint-decorations.js";
 import { InlayHintWidget } from "./inlay-hint-widget.js";
 
-// Minimal structural fixture — this package never imports caos-kt directly
-// (plan/00-risks-and-verified-facts.md risk #2/#8), matching diagnostic-
-// mapper.test.ts's fixture pattern rather than calling the real
-// getCaosInlayHints.
+// Test fixture helper for CaosInlayHint decoration tests.
 function fixture(overrides: Partial<CaosInlayHint> = {}): CaosInlayHint {
   return {
     position: { line: 0, character: 0 },

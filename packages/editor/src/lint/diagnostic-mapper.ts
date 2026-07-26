@@ -7,11 +7,7 @@ import type { CaosDiagnostic } from "@creatures-codemirror/engine";
 import { adjustForIndexing } from "@creatures-codemirror/engine";
 
 /**
- * Severity is an identity mapping (plan/00-risks-and-verified-facts.md
- * risk #9, resolved): caos-kt's `Diagnostic.severity` is a checked
- * `"info" | "warning" | "error"` union, an exact match for CM6's own
- * vocabulary (CM6's `Severity` also allows `"hint"`, which caos-kt never
- * produces). No lookup table needed.
+ * Maps caos-kt's `Diagnostic.severity` ("info" | "warning" | "error") to CM6's severity.
  */
 function toMessage(d: CaosDiagnostic): string {
   const parts = [d.message];

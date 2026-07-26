@@ -1,7 +1,5 @@
-// Synthesizes cancellation locally inside the worker, since closures cannot
-// cross a postMessage boundary (plan/00-risks-and-verified-facts.md risk #3).
-// The main thread never sends a function — only a {type:"cancel", id}
-// message that flips a flag this module owns.
+// Tracks request cancellation state inside the worker. Main thread sends
+// cancel messages by request ID, flipping flags managed by this module.
 
 interface RequestEntry {
   cancelled: boolean;

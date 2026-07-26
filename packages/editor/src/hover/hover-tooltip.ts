@@ -1,6 +1,4 @@
-// Wires @codemirror/view's mouse-driven hoverTooltip to the shared
-// showHoverAt entry point (./touch-hover.ts). See plan/05-hover-and-inlay-
-// hints.md Part A.
+// Wires @codemirror/view's mouse-driven hoverTooltip to showHoverAt.
 import { hoverTooltip } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
 import type { CaosEngineClient, GameVariant } from "@creatures-codemirror/engine";

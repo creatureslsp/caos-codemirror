@@ -1,19 +1,4 @@
-// Shared minimal Markdown-ish renderer for hover tooltips
-// (./hover-tooltip.ts). Deliberately not a full markdown parser:
-// formatCaosDocumentation's actual output shape (verified in
-// vs-caos-editor/packages/caos-util/src/documentation-formattter.ts before
-// writing this file) is always `**COMMAND** (returnType) **param**
-// (type@ValuesListName)...` followed by a `"   \n"`-joined (LSP hard-break)
-// description — only `**bold**` and line breaks ever appear — so that's all
-// this renders. Phase 4's completion `info()` deliberately does *not* use
-// this (item-converter.ts's own note: completion `documentation` is always
-// plain text, never markdown).
-//
-// Input is HTML-escaped first, then only `<strong>`/`<br>` are introduced by
-// regexes operating on the already-escaped text — any `<`/`>`/`&` etc. in
-// the original content can no longer form a tag, so this is safe against
-// content that happens to contain HTML-like text, even though the content
-// is effectively static/trusted engine output (defense in depth).
+// Minimal Markdown-ish renderer for hover tooltips. Renders bold text and line breaks safely.
 function escapeHtml(text: string): string {
   return text
     .replace(/&/g, "&amp;")

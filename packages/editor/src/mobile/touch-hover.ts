@@ -1,24 +1,4 @@
-// Touch trigger for the hover tooltip registered by ../hover/hover-tooltip.ts
-// (plan/06-mobile-ux-and-performance.md, risk #6). Mouse-driven hover
-// already works via @codemirror/view's own hoverTooltip pointermove timer;
-// this plugin only reacts to touch/pen pointers, so it's safe to include
-// unconditionally alongside caosHoverTooltip() on both desktop and mobile.
-//
-// Default trigger is tap-with-indicator, not long-press-on-token: a
-// long-press on editable text is the OS's native "select/copy" gesture,
-// and hijacking it for hover docs would fight that gesture rather than
-// complementing it (risk #6, accepted tradeoff — not fully settled pending
-// real user testing). Deliberately structured as a `trigger` option rather
-// than a hardcoded implementation so long-press can be selected instead
-// (or added to) without rewriting this plugin.
-//
-// This module intentionally does *not* duplicate ../hover/touch-hover.ts's
-// fetch/render logic (that file's name predates this one and refers to
-// something different — the shared showHoverAt() fetch/render entry point
-// reused by both the mouse hoverTooltip source and, indirectly, this touch
-// trigger). This file only decides *when* to ask CM6 to show that tooltip,
-// via the view-level activateHover()/closeHoverTooltips() API — the same
-// mechanism CM6's own mouse-hover implementation uses internally.
+// Touch/pen-only trigger for hover tooltips. Mouse pointers are unaffected.
 import { EditorView, ViewPlugin, activateHover, closeHoverTooltips } from "@codemirror/view";
 import type { Extension } from "@codemirror/state";
 

@@ -1,8 +1,4 @@
-// Exercises CaosEngineClient's request/response bookkeeping without a real
-// Worker (Node's "node" test environment has no global Worker — see
-// vitest.config.ts) or a real caos-kt engine: a minimal MockWorker fake
-// stands in, letting these tests assert on exactly what gets posted and
-// simulate exactly what comes back.
+// Tests for CaosEngineClient request/response bookkeeping using a MockWorker.
 import { describe, expect, it, vi } from "vitest";
 import { CancelledError, CaosEngineClient } from "./worker-client.js";
 import type { RpcRequest, RpcResponse } from "../worker/rpc-protocol.js";
@@ -47,10 +43,6 @@ describe("CaosEngineClient", () => {
 
     client.bumpRevision();
 
-    // A real {type:"cancel"} message reaches the worker (this is the actual
-    // fix — request-registry.ts's keepGoing flag flips so caos-kt's
-    // parse/validation loop can abort early, not just get its result
-    // silently dropped on arrival).
     expect(worker.sent).toEqual([
       expect.objectContaining({ type: "fullAnalysis", id: 1 }),
       expect.objectContaining({ type: "cancel", id: 1 }),

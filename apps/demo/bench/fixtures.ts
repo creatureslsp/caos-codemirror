@@ -1,9 +1,4 @@
 // Representative document-size fixtures for bench/main.ts
-// (plan/06-mobile-ux-and-performance.md). CAOS scripts are typically short
-// per-agent event scripts (the plan's own framing for why a viewport-
-// scoped-parse fallback might not even be justified) — so a "1000-line
-// document" here is many small scripts concatenated, not one deeply nested
-// script, matching how a real .cos file actually grows.
 const LINES_PER_BLOCK = 9;
 
 function scriptBlock(index: number): string {

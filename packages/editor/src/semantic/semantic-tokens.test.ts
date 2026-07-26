@@ -4,9 +4,7 @@ import { classNamesFor, decodeSemanticTokens } from "./decode-semantic-tokens.js
 import { buildSemanticDecorations } from "./build-decorations.js";
 import type { SemanticTokensLegend } from "./legend.js";
 
-// Mirrors the real, code-verified legend order from caos-util's
-// semantics-legend.ts (plan/00-risks-and-verified-facts.md risk #10), not
-// hardcoded assumptions about index meaning beyond what's needed here.
+// Test legend order matching semantics-legend.ts.
 const legend: SemanticTokensLegend = {
   tokenTypes: [
     "command", "rvalue", "lvalue", "string", "token", "variable",

@@ -3,10 +3,7 @@ import { Text } from "@codemirror/state";
 import type { CaosDiagnostic } from "@creatures-codemirror/engine";
 import { toCM6Diagnostic } from "./diagnostic-mapper.js";
 
-// Minimal structural fixture — this package never imports caos-kt directly
-// (plan/00-risks-and-verified-facts.md risk #2/#8), so tests build plain
-// objects matching CaosDiagnostic's shape rather than calling the real
-// caosValidationAsDiagnostics.
+// Test fixture helper for CaosDiagnostic mapping tests.
 function fixture(overrides: Partial<CaosDiagnostic> = {}): CaosDiagnostic {
   return {
     severity: "error",
@@ -28,7 +25,7 @@ function fixture(overrides: Partial<CaosDiagnostic> = {}): CaosDiagnostic {
 describe("toCM6Diagnostic", () => {
   const doc = Text.of(["zzzz", "scrp 1 1 1 0", "endm"]);
 
-  it("maps severity through as an identity (risk #9 — checked union matches CM6's vocabulary)", () => {
+  it("maps severity through as an identity", () => {
     for (const severity of ["info", "warning", "error"] as const) {
       const d = toCM6Diagnostic(fixture({ severity }), doc);
       expect(d.severity).toBe(severity);

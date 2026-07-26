@@ -1,7 +1,4 @@
-// Builds a CM6 DecorationSet from the worker's raw InlayHint[] (from
-// getCaosInlayHints, called directly against the shared parseResult — see
-// plan/05-hover-and-inlay-hints.md's core decision: no reimplementation of
-// the bitflag/priority hint algorithm here, purely position/rendering).
+// Builds a CM6 DecorationSet from raw InlayHint[] data.
 import type { Text } from "@codemirror/state";
 import { RangeSetBuilder } from "@codemirror/state";
 import { Decoration, type DecorationSet } from "@codemirror/view";

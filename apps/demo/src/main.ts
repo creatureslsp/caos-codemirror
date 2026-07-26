@@ -69,12 +69,6 @@ if (!toolbarQuery) throw new Error("#toolbar element missing");
 const toolbar = toolbarQuery;
 
 async function main(): Promise<void> {
-  // plan/06-mobile-ux-and-performance.md: on a measurably slow connection
-  // or low-end device, defer constructing CaosEngineClient (and so
-  // fetching the ~549KB worker bundle behind it) until idle or first
-  // interaction with #editor, instead of competing with initial page load.
-  // No signal available at all (most desktop browsers) resolves to
-  // "immediate" — see bundle-strategy.ts's chooseEngineLoadTiming.
   const timing = chooseEngineLoadTiming();
   log(`Engine load timing chosen: "${timing}" (device/network heuristic).`);
   if (timing === "first-interaction") {
@@ -97,14 +91,7 @@ async function main(): Promise<void> {
   await client.setVariant(currentVariant);
   log(`setVariant('${currentVariant}') -> ok`);
 
-  // plan/07: switching variants must re-validate/re-hint/re-complete
-  // without recreating the whole EditorView. All variant-dependent
-  // extensions live in this one Compartment; a variant change
-  // reconfigures it with fresh plugin instances (each ViewPlugin class is
-  // freshly defined by these factory calls, so CM6 tears down and
-  // reconstructs rather than reusing stale state), which also makes each
-  // plugin's constructor fire its own immediate/near-immediate analysis
-  // request instead of waiting out a debounce meant for keystrokes.
+  // Compartment allowing dynamic reconfiguration on variant switch
   const analysisCompartment = new Compartment();
 
   function buildAnalysisExtensions() {
@@ -125,9 +112,6 @@ async function main(): Promise<void> {
     ];
   }
 
-  // Created before the EditorView below since its updateListener extension
-  // closes over `panel` — defining it first avoids relying on the panel's
-  // first real invocation happening on a later tick.
   const panel = createCaosPanel({
     inlayHintOptionIds: initResponse.inlayHintOptions,
     initialInlayHintOptions: DEFAULT_INLAY_HINT_OPTIONS,
@@ -145,19 +129,10 @@ async function main(): Promise<void> {
         basicSetup,
         caosLanguageSupport(),
         analysisCompartment.of(buildAnalysisExtensions()),
-        // Phase 6: touch/pen-only hover trigger (mouse hover above is
-        // untouched by this), keyboard-aware viewport handling, larger
-        // touch targets, and a manual completion-trigger button (there's
-        // no Ctrl+Space on a touch keyboard).
         mobileHoverTrigger(),
         mobileViewport(),
         touchTheme,
         completionTrigger(),
-        // diagnosticCount(state) is a cheap StateField read (not a
-        // recomputation), so no need to gate this on which transaction
-        // fired — every update (including the async setDiagnosticsEffect
-        // dispatch @codemirror/lint's own linter() issues) should refresh
-        // the panel's count.
         EditorView.updateListener.of((update) => {
           panel.setDiagnosticsCount(diagnosticCount(update.state));
         }),
@@ -166,7 +141,6 @@ async function main(): Promise<void> {
     parent: editorParent,
   });
 
-  // --- Toolbar: variant picker + fixture picker ---
   const variantLabel = document.createElement("label");
   variantLabel.textContent = "Variant: ";
   const variantPicker = createVariantPicker({
@@ -205,11 +179,7 @@ async function main(): Promise<void> {
 
   panel.setDiagnosticsCount(diagnosticCount(view.state));
 
-  log("Editor constructed with Layer 1 (StreamLanguage) + Layer 2 (semantic overlay) + diagnostics + autocomplete + hover/inlay hints wired up.");
-  log("Use the Variant/Fixture selectors above the editor to exercise plan/07's checklist scenarios.");
-  log("On a touch device: tap a command name to see hover docs, tap the 'Suggest' button below the editor to trigger completion, and open the on-screen keyboard to confirm the editor/tooltips stay above it.");
-  log("See apps/demo/bench/ for the fullAnalysis latency benchmark harness (plan/06-mobile-ux-and-performance.md verification item 4).");
-  log("See apps/demo/TEST-CHECKLIST.md for the full manual verification checklist (plan/07-demo-app-and-verification.md).");
+  log("Editor initialized.");
 }
 
 main().catch((err) => {

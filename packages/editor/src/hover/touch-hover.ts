@@ -1,8 +1,4 @@
-// Shared hover fetch+render entry point (plan/05-hover-and-inlay-hints.md):
-// used directly by ./hover-tooltip.ts's mouse-driven hoverTooltip source
-// below, and reused as-is by Phase 6's touch/tap trigger mechanism so the
-// touch UX work (deciding *when* to call this) doesn't duplicate the
-// fetch/render logic (deciding *what* to show).
+// Shared hover fetch+render entry point for mouse and touch interactions.
 import type { EditorView, Tooltip } from "@codemirror/view";
 import type { CaosEngineClient, GameVariant } from "@creatures-codemirror/engine";
 import { cmOffsetToLineChar } from "@creatures-codemirror/engine";

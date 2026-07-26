@@ -1,6 +1,4 @@
-// Widget-decoration substitute for CM6's lack of a first-class inlay-hint
-// API (plan/05-hover-and-inlay-hints.md's "Key design decisions" — the
-// direct answer to replicating the VS Code extension's inlay hints here).
+// Widget-decoration implementation for inline inlay hints.
 import { WidgetType } from "@codemirror/view";
 
 export class InlayHintWidget extends WidgetType {

@@ -1,7 +1,5 @@
 // Main-thread wrapper around the CAOS engine Worker: correlates
-// request/response pairs by id, and drops responses to stale requests as a
-// defense-in-depth guard on top of explicit cancellation
-// (plan/00-risks-and-verified-facts.md risk #7).
+// request/response pairs by id and drops responses to stale requests.
 import type {
   CancelRequest,
   FullAnalysisResponse,
@@ -22,9 +20,7 @@ export interface CaosEngineClientOptions {
 }
 
 /** Rejection reason used for a request superseded by bumpRevision() (or an
- * explicit cancel() call) — distinct from a genuine worker/RPC failure so
- * call sites can tell "this was deliberately abandoned, don't log it as an
- * error" apart from "something actually went wrong". */
+ * explicit cancel() call). */
 export class CancelledError extends Error {
   constructor() {
     super("cancelled");
@@ -38,10 +34,6 @@ interface PendingEntry {
   revision: number;
 }
 
-// Plain `Omit` is not distributive over unions (it collapses to only the
-// keys common to every member); this form re-distributes over each member
-// of the union first so request-kind-specific fields (e.g. `variant`,
-// `text`) survive.
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
 type OutgoingRequest = DistributiveOmit<
   Extract<RpcRequest, { type: Exclude<RequestKind, "cancel"> }>,
@@ -53,16 +45,7 @@ export class CaosEngineClient {
   private nextId = 1;
   private revision = 0;
   private readonly pending = new Map<number, PendingEntry>();
-  // Coalesces concurrent/near-simultaneous fullAnalysis() calls for the same
-  // (variant, text) pair into a single worker round trip (plan/00-risks-and-
-  // verified-facts.md risk #7): Phase 2's semantic-tokens plugin and Phase
-  // 3's linter each independently debounce and call fullAnalysis with their
-  // own timers, so without this a keystroke pause could trigger two
-  // requests — each re-parsing the identical document — instead of one.
-  // Keyed by content rather than revision since validity depends on the
-  // text/variant matching, not on request bookkeeping. Kept as a single
-  // most-recent entry (not a full cache) since only back-to-back requests
-  // for the same content need to share a result.
+  // Coalesces concurrent fullAnalysis() calls for the same parameters into a single worker round trip.
   private lastAnalysisKey: string | null = null;
   private lastAnalysisPromise: Promise<FullAnalysisResponse> | null = null;
 
@@ -76,19 +59,7 @@ export class CaosEngineClient {
     };
   }
 
-  /** Bump on every document change, and actively cancel every currently
-   * in-flight request (rather than just marking them stale for a
-   * silent-drop at response time): posts a real {type:"cancel"} to the
-   * Worker for each one, so request-registry.ts's keepGoing flag actually
-   * stops caos-kt's parse/validation loop early instead of letting it run
-   * to completion only to have the response discarded on arrival. Every
-   * request sent under a revision that is no longer current would have had
-   * its response dropped anyway (handleMessage below) — this just makes
-   * that abandonment eager instead of wasteful. Safe to call from more than
-   * one plugin on the same transaction (e.g. semantic-tokens-plugin.ts and
-   * inlay-hints-plugin.ts both do): after the first call's cancellations,
-   * `pending` is left with only requests sent under the new revision, so a
-   * second call in the same tick is a no-op. */
+  /** Bumps the document revision and cancels all currently in-flight requests. */
   bumpRevision(): number {
     this.revision += 1;
     for (const id of [...this.pending.keys()]) {
@@ -111,9 +82,6 @@ export class CaosEngineClient {
     disabledInlayHints: string[] = [],
     minimumParameterCount?: number | null,
   ): Promise<FullAnalysisResponse> {
-    // Inlay-hint options are part of the cache key (not just variant/text):
-    // toggling them must produce a fresh worker round trip rather than
-    // reusing a memoized response computed under different settings.
     const key = `${variant} ${minimumParameterCount ?? ""} ${disabledInlayHints.join(",")} ${text}`;
     if (this.lastAnalysisKey === key && this.lastAnalysisPromise) {
       return this.lastAnalysisPromise;
@@ -128,8 +96,6 @@ export class CaosEngineClient {
     }) as Promise<FullAnalysisResponse>;
     this.lastAnalysisKey = key;
     this.lastAnalysisPromise = promise;
-    // Drop the cache entry on failure (cancelled/stale/worker error) so a
-    // retry for the same content doesn't reuse a rejected promise forever.
     promise.catch(() => {
       if (this.lastAnalysisPromise === promise) {
         this.lastAnalysisKey = null;
@@ -139,14 +105,6 @@ export class CaosEngineClient {
     return promise;
   }
 
-  // Deliberately never debounced or memoized (unlike fullAnalysis above) —
-  // plan/00-risks-and-verified-facts.md risk #7: perceived responsiveness
-  // matters most here, and it's only tenable because the worker calls the
-  // cheap, scoped parseCaosNear internally rather than a full-document
-  // parse. Staleness across rapid keystrokes is still handled generically —
-  // a document edit bumps the revision (see semantic-tokens-plugin.ts),
-  // which drops any in-flight response, including a completions one, whose
-  // revision no longer matches (handleMessage below).
   getCompletions(
     variant: GameVariant,
     text: string,
@@ -162,10 +120,6 @@ export class CaosEngineClient {
     }) as Promise<GetCompletionsResponse>;
   }
 
-  // Deliberately never debounced or memoized, same rationale as
-  // getCompletions above: a hover request fires once per pointer-idle at a
-  // single position and the worker's getHoverItem call is cheap. Staleness
-  // is handled the same generic revision-drop way in handleMessage below.
   getHover(variant: GameVariant, text: string, line: number, character: number): Promise<GetHoverResponse> {
     return this.send({
       type: "getHover",

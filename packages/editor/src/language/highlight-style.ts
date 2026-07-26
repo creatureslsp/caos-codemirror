@@ -1,11 +1,4 @@
-// Maps caosTags (see caos-tags.ts) to CSS classes, and ships their actual
-// colors via CM6's baseTheme mechanism so consumers get working syntax
-// highlighting without importing a separate stylesheet — the idiomatic CM6
-// packaging approach. "&dark" selectors apply when the editor's theme
-// facet is flagged dark (e.g. a consumer adds
-// `EditorView.theme({...}, {dark: true})` or a dark theme package),
-// satisfying plan/02-syntax-highlighting.md Layer 1's "light + dark
-// variants" requirement.
+// Highlight style definition mapping caosTags to CSS classes with theme support.
 import { HighlightStyle } from "@codemirror/language";
 import { EditorView } from "@codemirror/view";
 import { caosTags } from "./caos-tags.js";

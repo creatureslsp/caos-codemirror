@@ -1,21 +1,4 @@
-// Device/network-aware timing for when to construct CaosEngineClient
-// (plan/06-mobile-ux-and-performance.md). This is main-thread-only code —
-// it never runs inside the Worker itself (see ../worker/lib-mode.ts for
-// the worker-side counterpart this file's doc comment below refers to).
-//
-// Scope, per plan/00-risks-and-verified-facts.md risk #1: the only lever
-// available today is *when* CaosEngineClient (and so the ~549KB worker
-// bundle behind it) gets constructed — not *how much* it loads. A slim
-// command-library bundle is declared in caos-kt's types but has no shipped
-// implementation, so there is no "less data" branch to add here yet;
-// ../worker/lib-mode.ts's CAOS_LIB_MODE flag is where that lever would go
-// if/when upstream ships one — this file doesn't duplicate it.
-//
-// navigator.connection (Network Information API) and navigator.deviceMemory
-// (Device Memory API) are both non-standard and absent from TypeScript's
-// lib.dom.d.ts (unlike navigator.hardwareConcurrency, which is standard) —
-// declared locally below rather than pulled from a third-party @types
-// package, since only a couple of fields are needed.
+// Device/network-aware timing for when to construct CaosEngineClient.
 interface NetworkInformationLike {
   /** "slow-2g" | "2g" | "3g" | "4g", per the spec — typed as a bare string
    * since the underlying browser API itself doesn't expose a narrower
@@ -35,9 +18,7 @@ export interface DeviceSignals {
 }
 
 /** Reads whatever of navigator.connection/.deviceMemory/.hardwareConcurrency
- * the current browser actually exposes; fields the browser doesn't support
- * (or when there's no `navigator` at all, e.g. under Node in tests) are
- * simply absent, not defaulted to a guessed value. */
+ * the current browser actually exposes. */
 export function readDeviceSignals(): DeviceSignals {
   if (typeof navigator === "undefined") return {};
   const nav = navigator as NavigatorWithDeviceSignals;
@@ -55,25 +36,16 @@ const LOW_MEMORY_GB_THRESHOLD = 2;
 const LOW_CORE_COUNT_THRESHOLD = 4;
 
 /**
- * Picks a load timing from device/network signals. No signal available at
- * all (desktop Safari/Firefox support none of these APIs) falls through to
- * "immediate" — deferring by default on capable-but-unmeasurable devices
- * would only add latency to the first real interaction for no benefit.
+ * Picks a load timing from device/network signals.
  */
 export function chooseEngineLoadTiming(signals: DeviceSignals = readDeviceSignals()): EngineLoadTiming {
   if (signals.effectiveType != null && SLOW_EFFECTIVE_TYPES.has(signals.effectiveType)) {
-    // The worker bundle is a ~549KB download (risk #1) — on a measurably
-    // slow connection, don't compete with the initial page load for it at
-    // all; wait until the user actually does something that needs it.
     return "first-interaction";
   }
   const lowMemory = signals.deviceMemoryGb != null && signals.deviceMemoryGb <= LOW_MEMORY_GB_THRESHOLD;
   const lowCores =
     signals.hardwareConcurrency != null && signals.hardwareConcurrency <= LOW_CORE_COUNT_THRESHOLD;
   if (lowMemory || lowCores) {
-    // Low-end but not necessarily slow-network: still worth loading ahead
-    // of an explicit interaction (so the first real use isn't blocked on a
-    // cold worker), just not competing with first paint/hydration.
     return "idle";
   }
   return "immediate";
