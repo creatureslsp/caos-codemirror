@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>CAOS Editor</title>
+    <style>
+      :root { color-scheme: light dark; }
+      html, body { height: 100%; margin: 0; font-family: system-ui, sans-serif; }
+      body { overflow: hidden; }
+      #app { position: fixed; inset: 0; }
+
+      .shell-editor { position: absolute; inset: 0; }
+      .shell-editor .cm-editor { height: 100%; }
+
+      .shell-menu-button {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        font-size: 24px;
+        line-height: 1;
+        background: #222;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        /* Above CodeMirror's own .cm-panels-bottom (z-index: 300, e.g. the
+           mobile completion-trigger panel), which otherwise paints on top
+           of and intercepts clicks meant for this button. */
+        z-index: 450;
+        transition: bottom 0.15s ease;
+      }
+      /* Clear of the log pane's top edge so it never overlaps (and traps) the button. */
+      .shell-menu-button--log-open {
+        bottom: calc(40vh + 16px);
+      }
+
+      .shell-sheet-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 500;
+        display: flex;
+        align-items: flex-end;
+      }
+
+      .shell-sheet {
+        background: #fff;
+        color: #111;
+        width: 100%;
+        max-height: 80vh;
+        overflow: auto;
+        border-radius: 12px 12px 0 0;
+        padding: 16px;
+        box-sizing: border-box;
+      }
+
+      .shell-sheet-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .shell-sheet-header h2 { margin: 0; font-size: 18px; flex: 1; }
+
+      .shell-log {
+        display: none;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 40vh;
+        white-space: pre-wrap;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        padding: 8px;
+        background: #111;
+        color: #6f6;
+        overflow: auto;
+        z-index: 400;
+        box-sizing: border-box;
+      }
+      .shell-log-open { display: block; }
+
+      .panel-checkbox-row { display: block; font-size: 13px; margin-bottom: 2px; }
+      .panel-min-param-row { display: block; margin-top: 8px; font-size: 13px; }
+      .panel-min-param-row input { width: 4rem; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
