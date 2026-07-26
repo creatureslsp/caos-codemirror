@@ -33,11 +33,14 @@ diagnostics, autocomplete, hover docs, and inlay hints all wired up, plus:
   sheet — echoes engine lifecycle events (Worker load timing chosen,
   `init()`/`setVariant()` results, variant switches).
 
-No file/project persistence, offline support, or theming exists yet — those
-are `plan-webapp/`'s later phases. There is currently no in-app fixture
+An IndexedDB storage layer exists (`src/storage/` — file/project CRUD, trash
+and undelete, variant inheritance, search/sort; see
+[`../../plan-webapp/02-storage-layer.md`](../../plan-webapp/02-storage-layer.md)),
+but nothing in the UI calls it yet. There is currently no in-app fixture
 picker: `fixtures/empty.cos` is the only document this app loads today
 (`main.ts`'s `FIXTURES`/`DEFAULT_FIXTURE`); real file open/management arrives
-in Phase 03.
+in Phase 03, which wires this storage layer into a file/project browser.
+Offline support and theming are later phases still.
 
 See **[`TEST-CHECKLIST.md`](./TEST-CHECKLIST.md)** for the manual
 verification checklist.
@@ -48,6 +51,7 @@ verification checklist.
 pnpm build      # production build (emits both the main app and bench/ pages)
 pnpm preview    # serve the production build locally
 pnpm typecheck
+pnpm test       # storage-layer unit tests (Vitest + fake-indexeddb)
 ```
 
 ## Latency benchmark
