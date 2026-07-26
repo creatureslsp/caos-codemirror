@@ -4,7 +4,7 @@ import { diagnosticCount, lintGutter } from "@codemirror/lint";
 import { h, render } from "preact";
 import type { ComponentChildren } from "preact";
 import { signal } from "@preact/signals";
-import type { GameVariant } from "@creatures-codemirror/engine";
+import type { GameVariant, InitResponse } from "@creatures-codemirror/engine";
 import { CaosEngineClient, chooseEngineLoadTiming, scheduleEngineLoad } from "@creatures-codemirror/engine";
 import {
   caosCompletion,
@@ -41,6 +41,11 @@ import { createAutosaveController, fileLoadAnnotation, LAST_OPENED_FILE_ID_KEY }
 
 const GLOBAL_FALLBACK_VARIANT_KEY = "globalFallbackVariant";
 const DEFAULT_VARIANT: GameVariant = "DS";
+// Only used to detect a cold, fully-offline first-ever visit (SW has nothing
+// cached yet, so the engine Worker's module fetch never resolves) -- long
+// enough that a real cache hit (near-instant, no network involved) never
+// trips it, per ../../plan-webapp/05-offline-pwa.md.
+const OFFLINE_ENGINE_LOAD_TIMEOUT_MS = 5000;
 
 let logEl: HTMLDivElement | null = null;
 
@@ -102,6 +107,39 @@ async function resolveBootFile(): Promise<{ file: CaosFile; project: CaosProject
   return { file, project: null, variant: fallbackVariant };
 }
 
+function isOffline(): boolean {
+  return typeof navigator !== "undefined" && "onLine" in navigator && navigator.onLine === false;
+}
+
+/**
+ * Races `client.init()` against a timeout, but only when the browser reports
+ * offline -- an online load (even a slow one) keeps waiting on the real
+ * init() promise indefinitely, unchanged from prior behavior. Distinct from
+ * the "first-interaction" tap-to-load affordance: that assumes the bundle is
+ * reachable, this is for when it provably isn't (a cold offline first visit,
+ * before the service worker has cached anything).
+ */
+async function initEngineOrShowOfflineState(
+  client: CaosEngineClient,
+  editorContainer: HTMLDivElement,
+): Promise<InitResponse | null> {
+  const initPromise = client.init();
+  if (!isOffline()) return initPromise;
+
+  const timedOut = Symbol("timed out");
+  const result = await Promise.race([
+    initPromise,
+    new Promise<typeof timedOut>((resolve) => setTimeout(() => resolve(timedOut), OFFLINE_ENGINE_LOAD_TIMEOUT_MS)),
+  ]);
+  if (result !== timedOut) return result;
+
+  log("Offline and the CAOS engine hasn't been cached on this device yet -- can't load.");
+  editorContainer.textContent =
+    "You're offline, and this editor hasn't finished its first online load yet, so it can't start. " +
+    "Connect to the internet once and reload — after that it will keep working offline.";
+  return null;
+}
+
 async function main(): Promise<void> {
   if (!editorParent) throw new Error("Shell did not mount an editor container");
   const editorContainer = editorParent;
@@ -123,9 +161,14 @@ async function main(): Promise<void> {
     { timing, interactionTarget: editorContainer },
   );
   log("CaosEngineClient constructed.");
-  editorContainer.textContent = "";
 
-  const initResponse = await client.init();
+  const initResult = await initEngineOrShowOfflineState(client, editorContainer);
+  if (!initResult) return; // offline-blocked; explicit state is already showing.
+  // Re-bound with an explicit non-nullable type: TS's control-flow narrowing
+  // from the guard above doesn't reach the nested closures below that
+  // reference this value (buildAnalysisExtensions, rebuildSheetBody).
+  const initResponse: InitResponse = initResult;
+  editorContainer.textContent = "";
   log("init() ->", initResponse);
 
   const boot = await resolveBootFile();
