@@ -1,9 +1,9 @@
-/** Status panel: diagnostics count, feature status, inlay-hint category toggles. */
+/** Inlay Hints settings tab: diagnostics count, feature status, inlay-hint category toggles. */
 import type { Signal } from "@preact/signals";
 import { useState } from "preact/hooks";
 import type { InlayHintOptions } from "@creatures-codemirror/editor";
 
-export interface CaosPanelProps {
+export interface InlayHintsTabProps {
   /** Provider ids from InitResponse.inlayHintOptions. */
   inlayHintOptionIds: string[];
   initialInlayHintOptions: InlayHintOptions;
@@ -11,7 +11,7 @@ export interface CaosPanelProps {
   onInlayHintOptionsChange: (options: InlayHintOptions) => void;
 }
 
-export function CaosPanel(props: CaosPanelProps) {
+export function InlayHintsTab(props: InlayHintsTabProps) {
   const { inlayHintOptionIds, initialInlayHintOptions, diagnosticsCount, onInlayHintOptionsChange } = props;
 
   const [disabled, setDisabled] = useState(() => new Set(initialInlayHintOptions.disabledInlayHints));

@@ -26,7 +26,9 @@ import {
 import { Shell } from "./shell.js";
 import { VariantPicker } from "./variant-picker.js";
 import { VariantChangePrompt } from "./variant-change-prompt.js";
-import { CaosPanel } from "./panel.js";
+import { SettingsPanel } from "./settings/SettingsPanel.js";
+import { InlayHintsTab } from "./settings/InlayHintsTab.js";
+import { SETTINGS_TABS } from "./settings/tabs.js";
 import { FileBrowser } from "./files/FileBrowser.js";
 import { checkNameConflict, createFile, changeFileVariant, getFile, type CaosFile } from "./storage/files.js";
 import {
@@ -63,14 +65,16 @@ if (!appQuery) throw new Error("#app element missing");
 const app = appQuery;
 
 let editorParent: HTMLDivElement | null = null;
-const sheetBody = signal<ComponentChildren>(null);
+const filesBody = signal<ComponentChildren>(null);
+const settingsBody = signal<ComponentChildren>(null);
 
 render(
   h(Shell, {
     editorContainerRef: (node) => {
       editorParent = node;
     },
-    sheetBody,
+    filesBody,
+    settingsBody,
   }),
   app,
 );
@@ -166,7 +170,7 @@ async function main(): Promise<void> {
   if (!initResult) return; // offline-blocked; explicit state is already showing.
   // Re-bound with an explicit non-nullable type: TS's control-flow narrowing
   // from the guard above doesn't reach the nested closures below that
-  // reference this value (buildAnalysisExtensions, rebuildSheetBody).
+  // reference this value (buildAnalysisExtensions, rebuildFilesBody).
   const initResponse: InitResponse = initResult;
   editorContainer.textContent = "";
   log("init() ->", initResponse);
@@ -185,7 +189,7 @@ async function main(): Promise<void> {
   // Prompt state for "just this file" vs "whole project" on a project file's
   // variant change; `null` when no prompt is showing. Plain closure state
   // (not a signal) — resolved the same imperative way `currentVariant` is,
-  // via `rebuildSheetBody()`.
+  // via `rebuildFilesBody()`.
   let pendingVariantPrompt: { variant: GameVariant } | null = null;
 
   // Compartment allowing dynamic reconfiguration on variant switch
@@ -233,6 +237,25 @@ async function main(): Promise<void> {
 
   await autosave.openFile(activeFile.id);
 
+  // Registered once, not rebuilt per `rebuildFilesBody()` call: this tab's
+  // props (initResponse-derived ids/defaults, the stable view.dispatch-based
+  // callback) don't depend on activeFile/activeProject/currentVariant.
+  SETTINGS_TABS.push({
+    id: "inlay-hints",
+    label: "Inlay Hints",
+    render: () =>
+      h(InlayHintsTab, {
+        inlayHintOptionIds: initResponse.inlayHintOptions,
+        initialInlayHintOptions: DEFAULT_INLAY_HINT_OPTIONS,
+        diagnosticsCount,
+        onInlayHintOptionsChange: (options: InlayHintOptions) => {
+          view.dispatch({ effects: setInlayHintOptions.of(options) });
+          log("Inlay hint options changed:", options);
+        },
+      }),
+  });
+  settingsBody.value = h(SettingsPanel, null);
+
   async function applyVariantToEditor(variant: GameVariant): Promise<void> {
     currentVariant = variant;
     log(`Variant changed to ${variant} — re-validating.`);
@@ -250,7 +273,7 @@ async function main(): Promise<void> {
     }
     pendingVariantPrompt = null;
     await applyVariantToEditor(variant);
-    rebuildSheetBody();
+    rebuildFilesBody();
   }
 
   async function applyWholeProjectVariantChange(variant: GameVariant): Promise<void> {
@@ -263,14 +286,14 @@ async function main(): Promise<void> {
     // the open document, so the picker/live validation don't drift from what
     // a reload would actually restore for this file.
     await applyVariantToEditor(getEffectiveVariant(activeFile, activeProject));
-    rebuildSheetBody();
+    rebuildFilesBody();
   }
 
   function cancelVariantChange(): void {
     pendingVariantPrompt = null;
     // Re-sync VariantPicker's <select> back to `currentVariant`, undoing the
     // browser's already-applied (but not yet confirmed) native selection.
-    rebuildSheetBody();
+    rebuildFilesBody();
   }
 
   function requestVariantChange(variant: GameVariant): void {
@@ -280,18 +303,18 @@ async function main(): Promise<void> {
       return;
     }
     pendingVariantPrompt = { variant };
-    rebuildSheetBody();
+    rebuildFilesBody();
   }
 
-  // Reassigning `sheetBody.value` re-renders Shell's `{sheetBody.value}` slot, but
+  // Reassigning `filesBody.value` re-renders Shell's Files-section slot, but
   // Preact's positional reconciliation preserves each child component's own
-  // internal state (FileBrowser's browsing state, CaosPanel's checkboxes) across
-  // the reassignment — only needed here because a programmatic variant change
-  // (opening a file with a different effective variant, or resolving the
-  // file/project prompt) has to force VariantPicker's <select> to a new
-  // value, unlike a user-driven picker change.
-  function rebuildSheetBody(): void {
-    sheetBody.value = h(
+  // internal state (FileBrowser's browsing state) across the reassignment —
+  // only needed here because a programmatic variant change (opening a file
+  // with a different effective variant, or resolving the file/project
+  // prompt) has to force VariantPicker's <select> to a new value, unlike a
+  // user-driven picker change.
+  function rebuildFilesBody(): void {
+    filesBody.value = h(
       "div",
       null,
       h(FileBrowser, {
@@ -313,22 +336,13 @@ async function main(): Promise<void> {
             if (effectiveVariant !== currentVariant) {
               await applyVariantToEditor(effectiveVariant);
             }
-            rebuildSheetBody();
+            rebuildFilesBody();
           })();
         },
       }),
       h(VariantPicker, {
         initialVariant: currentVariant,
         onChange: requestVariantChange,
-      }),
-      h(CaosPanel, {
-        inlayHintOptionIds: initResponse.inlayHintOptions,
-        initialInlayHintOptions: DEFAULT_INLAY_HINT_OPTIONS,
-        diagnosticsCount,
-        onInlayHintOptionsChange: (options: InlayHintOptions) => {
-          view.dispatch({ effects: setInlayHintOptions.of(options) });
-          log("Inlay hint options changed:", options);
-        },
       }),
       pendingVariantPrompt &&
         activeProject &&
@@ -343,7 +357,7 @@ async function main(): Promise<void> {
     );
   }
 
-  rebuildSheetBody();
+  rebuildFilesBody();
 
   diagnosticsCount.value = diagnosticCount(view.state);
 
