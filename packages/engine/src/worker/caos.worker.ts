@@ -20,7 +20,7 @@
 import { useFullCaosLibDefinitions } from "@creatureslsp/caos/libsfile-full";
 import { parseCaos } from "@creatureslsp/caos/parser";
 import { caosValidationAsDiagnostics } from "@creatureslsp/caos/validation-report";
-import { getCaosInlayHintsWithOffset, getCaosInlayOptions} from "@creatureslsp/caos/inlay-hints";
+import { getCaosInlayHints, getCaosInlayOptions} from "@creatureslsp/caos/inlay-hints";
 import type { CaosCompletionOptions, CaosCompletionSettings } from "@creatureslsp/caos/completions";
 import { getCompletionItems } from "@creatureslsp/caos/completions";
 import { semanticLegend } from "@creatureslsp/caos/semantics-legend";
