@@ -27,6 +27,7 @@ import {
   caosLanguageSupport,
   inlayHints,
   inlayHintTheme,
+  layer1ClassesAt,
   semanticTokenClassesAt,
   semanticTokens,
   semanticTokensTheme,
@@ -38,14 +39,22 @@ import { findTokenKey } from "./token-keys.js";
 import type { ThemeMode } from "./theme-store.js";
 
 /**
- * Maps a `semanticTokenClassesAt()` class back to its `TOKEN_KEYS` key --
- * the inverse of `decode-semantic-tokens.ts`'s `classNamesFor` naming
- * convention (`cm-caos-sem-<type>` / `cm-caos-mod-<modifier>`), which
- * `token-keys.ts` mirrors exactly (modifier keys are stored as `mod-<name>`).
+ * Maps a `semanticTokenClassesAt()`/`layer1ClassesAt()` class back to its
+ * `TOKEN_KEYS` key -- the inverse of `decode-semantic-tokens.ts`'s
+ * `classNamesFor` naming convention (`cm-caos-sem-<type>` /
+ * `cm-caos-mod-<modifier>`), which `token-keys.ts` mirrors exactly (modifier
+ * keys are stored as `mod-<name>`). Layer-1-only classes (e.g.
+ * `cm-caos-number`) fall through to the plain `cm-caos-<key>` case, which
+ * matches `TOKEN_KEYS` entries directly -- see that file's header comment on
+ * `--caos-number`/`--caos-string` being shared between both layers.
  */
 function tokenKeyForClass(cls: string): string | null {
   if (cls.startsWith("cm-caos-sem-")) return cls.slice("cm-caos-sem-".length);
   if (cls.startsWith("cm-caos-mod-")) return `mod-${cls.slice("cm-caos-mod-".length)}`;
+  if (cls.startsWith("cm-caos-")) {
+    const key = cls.slice("cm-caos-".length);
+    return findTokenKey(key) ? key : null;
+  }
   return null;
 }
 
@@ -121,7 +130,14 @@ export function PreviewPanel({ client, legend, mode }: PreviewPanelProps) {
             click: (event, editorView) => {
               const pos = editorView.posAtCoords({ x: event.clientX, y: event.clientY });
               if (pos == null) return;
-              setSelectedClasses(semanticTokenClassesAt(editorView.state, pos));
+              // Layer 2 (semantic) takes priority where both apply, but
+              // plenty of tokens -- e.g. numeric literals -- only ever get
+              // classified by Layer 1, see layer1ClassesAt()'s doc comment.
+              const classes = new Set([
+                ...semanticTokenClassesAt(editorView.state, pos),
+                ...layer1ClassesAt(editorView.state, pos),
+              ]);
+              setSelectedClasses([...classes]);
             },
           }),
         ],

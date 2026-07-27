@@ -4,6 +4,7 @@ export { caosStreamParser } from "./language/stream-parser.js";
 export type { CaosStreamState } from "./language/stream-parser.js";
 export { caosTags } from "./language/caos-tags.js";
 export type { CaosTokenName } from "./language/caos-tags.js";
+export { layer1ClassesAt } from "./language/layer1-classes-at.js";
 
 export { semanticTokens, semanticTokensField, semanticTokenClassesAt } from "./semantic/semantic-tokens-plugin.js";
 export type { SemanticTokensPluginOptions } from "./semantic/semantic-tokens-plugin.js";
