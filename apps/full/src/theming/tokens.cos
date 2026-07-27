@@ -9,6 +9,8 @@ doif name "color" = "red"
 	anim [1 2 3 2 1 255]
 endi
 
+dde: pict Y|D
+dde: puts [Hello Panda!]
 dde: getb cnam
 
 new: simp 1 1 2 "blnk" 1 1 8000
