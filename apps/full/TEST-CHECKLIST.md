@@ -189,6 +189,26 @@ before assuming a blank slate at the start of a pass.
 - [ ] "Reset to defaults" in Advanced reverts all inlay-hint style fields
       (not colors) to their built-in values.
 
+## Color preview panel (Phase 09)
+
+- [ ] The Theme tab's "Preview" section shows a small, scrollable,
+      read-only editor rendering `tokens.cos` with full syntax + semantic
+      coloring and inlay hints — no cursor/selection editing, no
+      hover/completion UI on hover or typing attempts.
+- [ ] Change any token color (syntax, modifier, or inlay-hint) elsewhere in
+      the tab: the preview updates live with no tab switch or other trigger.
+- [ ] Toggle "Editing colors for" between Light/Dark: the preview's own
+      rendering switches to that mode's colors, independent of the app's
+      actual displayed theme (e.g. app in Light, "Editing colors for: Dark"
+      still shows dark-mode colors in the preview).
+- [ ] Tap a single-class token (e.g. a plain `Command`): one color control
+      opens for it. Tap a multi-class token (e.g. `new:`'s
+      command/agent-constructor/command-prefix combo): one independent
+      control per class opens, not one merged control.
+- [ ] Close and reopen the menu sheet (which unmounts/remounts the settings
+      tab) a couple of times while on the Theme tab: the preview re-renders
+      cleanly each time with no console errors.
+
 ## Golden path
 
 Variant: `DS` (default).

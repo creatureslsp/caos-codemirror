@@ -243,6 +243,25 @@
       .theme-palette-hex { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; opacity: 0.8; }
       .theme-palette-tokens { flex: 1; min-width: 100%; font-size: 12px; opacity: 0.7; }
 
+      /* Phase 09: second, read-only EditorView previewing live theme edits
+         against tokens.cos -- boxed and scrollable (its own height, not the
+         full-viewport sizing .shell-editor uses) so it sits inline in the
+         settings tab rather than fighting the sheet's own scroll. */
+      .theme-preview-panel { margin-bottom: 16px; }
+      .theme-preview-editor {
+        height: 220px;
+        overflow: auto;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 13px;
+      }
+      .theme-preview-editor .cm-editor { height: 100%; }
+      .theme-preview-token-bar {
+        margin-top: 8px;
+        padding-top: 4px;
+        border-top: 1px solid #eee;
+      }
+
       .theme-inlay-hints { margin-top: 16px; }
       .theme-slider-row {
         display: flex;

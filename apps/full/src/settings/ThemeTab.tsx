@@ -10,7 +10,10 @@
  * `inlay-hint-bg` tokens this tab previously left out.
  */
 import { useState } from "preact/hooks";
+import type { CaosEngineClient } from "@creatures-codemirror/engine";
+import type { SemanticTokensLegend } from "@creatures-codemirror/editor";
 import { TokenColorControl } from "./TokenColorControl.js";
+import { PreviewPanel } from "../theming/PreviewPanel.js";
 import { TOKEN_KEYS, findTokenKey, type TokenKeyDef } from "../theming/token-keys.js";
 import {
   clearTokenColor,
@@ -196,7 +199,12 @@ function InlayHintSettings({ mode }: { mode: ThemeMode }) {
   );
 }
 
-export function ThemeTab() {
+export interface ThemeTabProps {
+  client: CaosEngineClient;
+  legend: SemanticTokensLegend;
+}
+
+export function ThemeTab({ client, legend }: ThemeTabProps) {
   const [editingMode, setEditingMode] = useState<ThemeMode>(() => effectiveMode.value);
 
   const syntaxKeys = TOKEN_KEYS.filter((t) => t.category === "syntax");
@@ -249,6 +257,10 @@ export function ThemeTab() {
           </button>
         ))}
       </div>
+
+      <h3>Preview</h3>
+      <p class="theme-token-hint">Tap a token to edit its color — updates live as you change colors below.</p>
+      <PreviewPanel client={client} legend={legend} mode={editingMode} />
 
       <h3>Colors in use</h3>
       <PaletteSwatchList mode={editingMode} />

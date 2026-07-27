@@ -1,0 +1,28 @@
+**CAOS2Pray
+*# Pray-File "rubber-ball.agents"
+*# Agent Description = "A rubber ball for your norn"
+*# color = "red"
+
+* Animate if red
+doif name "color" = "red"
+	setv _p1_ 10
+	anim [1 2 3 2 1 255]
+endi
+
+dde: getb cnam
+
+new: simp 1 1 2 "blnk" 1 1 8000
+
+dbg: asrt mv00 eq ov99
+seta va00 targ
+outs "line1\nline2"
+
+outs bkds meta
+doif velx gt 10
+	velo 10 1
+	gsub slow_down
+endi
+
+subr slow_down
+
+retn

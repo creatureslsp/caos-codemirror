@@ -287,7 +287,7 @@ async function main(): Promise<void> {
   SETTINGS_TABS.push({
     id: "theme",
     label: "Theme",
-    render: () => h(ThemeTab, null),
+    render: () => h(ThemeTab, { client, legend: initResponse.semanticTokensLegend }),
   });
   settingsBody.value = h(SettingsPanel, null);
 
