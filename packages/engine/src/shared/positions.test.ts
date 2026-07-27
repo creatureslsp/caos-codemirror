@@ -51,10 +51,13 @@ describe("cmOffsetToLineChar / lineCharToCmOffset", () => {
 });
 
 describe("adjustForIndexing", () => {
+  // endColumn is the *inclusive* last column of the range (caos-kt, not an
+  // exclusive/one-past-the-end LSP-style bound) -- "bbbb" is 4 chars wide,
+  // so its inclusive last column is 4 (1-indexed) / 3 (0-indexed), not 5/4.
   it("converts a 1-indexed location to a 0-indexed CM6 offset range", () => {
     const doc = Text.of(["aaaa", "bbbb"]);
     const { from, to } = adjustForIndexing(
-      { startLine: 2, endLine: 2, startColumn: 1, endColumn: 5, indexing: "1-indexed" },
+      { startLine: 2, endLine: 2, startColumn: 1, endColumn: 4, indexing: "1-indexed" },
       doc,
     );
     expect(from).toBe(5); // start of line 2 (1-indexed) == line 1 (0-indexed) == offset 5
@@ -64,7 +67,7 @@ describe("adjustForIndexing", () => {
   it("converts a 0-indexed location to a 0-indexed CM6 offset range unchanged", () => {
     const doc = Text.of(["aaaa", "bbbb"]);
     const { from, to } = adjustForIndexing(
-      { startLine: 1, endLine: 1, startColumn: 0, endColumn: 4, indexing: "0-indexed" },
+      { startLine: 1, endLine: 1, startColumn: 0, endColumn: 3, indexing: "0-indexed" },
       doc,
     );
     expect(from).toBe(5);

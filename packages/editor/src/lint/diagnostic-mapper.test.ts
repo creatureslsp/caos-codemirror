@@ -3,7 +3,10 @@ import { Text } from "@codemirror/state";
 import type { CaosDiagnostic } from "@creatures-codemirror/engine";
 import { toCM6Diagnostic } from "./diagnostic-mapper.js";
 
-// Test fixture helper for CaosDiagnostic mapping tests.
+// Test fixture helper for CaosDiagnostic mapping tests. location matches
+// real @creatureslsp/caos@0.0.5 output for "Invalid input 'zzzz'" on a
+// document starting with "zzzz" -- endColumn/endIndex are the *inclusive*
+// last column/index of the range, not one-past-the-end.
 function fixture(overrides: Partial<CaosDiagnostic> = {}): CaosDiagnostic {
   return {
     severity: "error",
@@ -13,8 +16,8 @@ function fixture(overrides: Partial<CaosDiagnostic> = {}): CaosDiagnostic {
       startLine: 1,
       endLine: 1,
       startColumn: 1,
-      endColumn: 5,
-      startIndex: 0,
+      endColumn: 4,
+      startIndex: 1,
       endIndex: 4,
       indexing: "1-indexed",
     },
