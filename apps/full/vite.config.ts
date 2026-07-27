@@ -51,6 +51,10 @@ export default defineConfig({
     fs: {
       allow: [repoRoot],
     },
+    watch: {
+      // Watch linked package directories
+      ignored: ['!**/node_modules/@creatureslsp/caos/dist/**'],
+    },
   },
   build: {
     rollupOptions: {
@@ -59,5 +63,13 @@ export default defineConfig({
         bench: fileURLToPath(new URL("./bench/index.html", import.meta.url)),
       },
     },
+  },
+  optimizeDeps: {
+    exclude: [
+      '@creatureslsp/caos',
+      '@creatureslsp/caos-kt',
+      '@creatureslsp/catalogue',
+      '@creatureslsp/extension-util'
+    ],
   },
 });
