@@ -90,7 +90,10 @@ function bracketStringToken(stream: StringStream, state: CaosStreamState): CaosT
 
 function caos2DirectiveToken(stream: StringStream, state: CaosStreamState): CaosTokenName | null {
   if (stream.match(/^=/)) return "caos2Eq";
-  if (stream.match(/^"(?:\\.|[^"\\\n])*"?/)) return "string";
+  if (stream.match(/^"/)) {
+      state.inQuoteString = true;
+      return "string";
+  }
   if (stream.match(/^[^ \t\n]+/)) return "string";
   stream.next();
   state.inCaos2Directive = false;
