@@ -128,6 +128,39 @@ before assuming a blank slate at the start of a pass.
 - [ ] Change the variant on a **root-scope** file (no project): no prompt at
       all, applies immediately.
 
+## Theming: dark/light mode + color overrides (Phase 07)
+
+- [ ] With OS-level dark mode on and Settings → Theme → mode set to
+      "System": editor colors (e.g. type `* a comment`) use the dark
+      defaults. Flip the OS setting while the app is open (no reload): the
+      editor's colors update live.
+- [ ] Explicitly pick "Light" or "Dark" in the Theme tab: it applies
+      immediately, persists across a reload, and no longer follows
+      subsequent OS-level scheme changes until "System" is picked again.
+- [ ] In the Theme tab, change a syntax color (e.g. "Command") under
+      "Editing colors for: Light" where the Dark-mode value for that same
+      token has never been set: switch "Editing colors for" to Dark and
+      confirm it was auto-seeded with a companion color (not left at the
+      built-in default). Change the Light color again: the already-seeded
+      Dark value does **not** change again.
+- [ ] Spot-check color reachability across all four `packages/editor` theme
+      files, not just the syntax-color list in the tab: a Layer-1-only color
+      (e.g. "Comment"), a Layer-2 type (e.g. "Command"), and — via DevTools
+      (`document.documentElement.style` or the `--caos-*` computed styles,
+      since these two categories don't have dedicated Theme-tab rows yet,
+      Phase 08's territory) a touch-theme var (`--caos-panel-border`) and an
+      inlay-hint var (`--caos-inlay-hint`) all visibly change when set.
+- [ ] In the Theme tab's Modifiers section, check a modifier (e.g. "vaxx
+      (event variable)") and set its color, *without* touching the
+      "Variable" type color above: type CAOS containing both a plain
+      variable-type token and a `va00`/`ov00`/`mv00`-style indexed variable
+      (e.g. `seta va00 targ`) — only the indexed-variable token's color
+      changes. Uncheck the modifier: it reverts to following the Variable
+      type color again.
+- [ ] Then change the "Variable" type color itself (modifier still
+      unchecked): the indexed-variable token's color follows the new type
+      color too — confirms the fallthrough isn't a one-time snapshot.
+
 ## Golden path
 
 Variant: `DS` (default).

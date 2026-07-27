@@ -3,7 +3,7 @@ import { Compartment, EditorState } from "@codemirror/state";
 import { diagnosticCount, lintGutter } from "@codemirror/lint";
 import { h, render } from "preact";
 import type { ComponentChildren } from "preact";
-import { signal } from "@preact/signals";
+import { effect, signal } from "@preact/signals";
 import type { GameVariant, InitResponse } from "@creatures-codemirror/engine";
 import { CaosEngineClient, chooseEngineLoadTiming, scheduleEngineLoad } from "@creatures-codemirror/engine";
 import {
@@ -28,6 +28,7 @@ import { VariantPicker } from "./variant-picker.js";
 import { VariantChangePrompt } from "./variant-change-prompt.js";
 import { SettingsPanel } from "./settings/SettingsPanel.js";
 import { InlayHintsTab } from "./settings/InlayHintsTab.js";
+import { ThemeTab } from "./settings/ThemeTab.js";
 import { SETTINGS_TABS } from "./settings/tabs.js";
 import { FileBrowser } from "./files/FileBrowser.js";
 import { checkNameConflict, createFile, changeFileVariant, getFile, type CaosFile } from "./storage/files.js";
@@ -40,6 +41,8 @@ import {
 } from "./storage/projects.js";
 import { kvGet, kvSet } from "./storage/db.js";
 import { createAutosaveController, fileLoadAnnotation, LAST_OPENED_FILE_ID_KEY } from "./autosave.js";
+import { effectiveMode, loadThemeStore } from "./theming/theme-store.js";
+import { startApplyingTheme } from "./theming/apply-theme.js";
 
 const GLOBAL_FALLBACK_VARIANT_KEY = "globalFallbackVariant";
 const DEFAULT_VARIANT: GameVariant = "DS";
@@ -152,6 +155,14 @@ async function main(): Promise<void> {
   // ../../plan-webapp/00-risks-and-open-questions.md's trash-retention note.
   await sweepExpiredTrash();
 
+  // Hydrate themeMode/themeOverrides from kv and start the live
+  // prefers-color-scheme listener before anything paints, then start
+  // reactively applying overrides as --caos-* custom properties on the
+  // document root (ancestor of the editor DOM) per
+  // ../../plan-webapp/07-theming-data-model-dark-light.md.
+  await loadThemeStore();
+  startApplyingTheme();
+
   const timing = chooseEngineLoadTiming();
   log(`Engine load timing chosen: "${timing}" (device/network heuristic).`);
   if (timing === "first-interaction") {
@@ -195,6 +206,16 @@ async function main(): Promise<void> {
   // Compartment allowing dynamic reconfiguration on variant switch
   const analysisCompartment = new Compartment();
 
+  // Compartment toggling CM6's dark-mode marker extension -- an otherwise
+  // style-less `EditorView.theme({}, { dark: true })` that activates every
+  // `&dark` selector across the four packages/editor base themes. Reused
+  // for both live system-preference changes and an explicit mode pick, per
+  // ../../plan-webapp/07-theming-data-model-dark-light.md.
+  const darkModeCompartment = new Compartment();
+  function darkModeExtension() {
+    return effectiveMode.value === "dark" ? EditorView.theme({}, { dark: true }) : [];
+  }
+
   function buildAnalysisExtensions() {
     return [
       semanticTokens({
@@ -222,6 +243,7 @@ async function main(): Promise<void> {
         basicSetup,
         caosLanguageSupport(),
         analysisCompartment.of(buildAnalysisExtensions()),
+        darkModeCompartment.of(darkModeExtension()),
         mobileHoverTrigger(),
         mobileViewport(),
         touchTheme,
@@ -236,6 +258,14 @@ async function main(): Promise<void> {
   });
 
   await autosave.openFile(activeFile.id);
+
+  // Live-follows `effectiveMode` (system preference while themeMode is
+  // "system", or the explicit pick otherwise) -- runs immediately on
+  // creation (redundant with the initial compartment content above, but
+  // harmless) and again on every subsequent change, with no reload needed.
+  effect(() => {
+    view.dispatch({ effects: darkModeCompartment.reconfigure(darkModeExtension()) });
+  });
 
   // Registered once, not rebuilt per `rebuildFilesBody()` call: this tab's
   // props (initResponse-derived ids/defaults, the stable view.dispatch-based
@@ -253,6 +283,11 @@ async function main(): Promise<void> {
           log("Inlay hint options changed:", options);
         },
       }),
+  });
+  SETTINGS_TABS.push({
+    id: "theme",
+    label: "Theme",
+    render: () => h(ThemeTab, null),
   });
   settingsBody.value = h(SettingsPanel, null);
 
