@@ -1,15 +1,18 @@
 // Base theme for inlay hints styling.
-// A host app can restyle without forking this file.
+// A host app can restyle without forking this file. Padding/border-radius/
+// font are mode-independent (a single `--caos-inlay-hint-*` var each, no
+// `-dark` variant) since they're layout/typography, not color -- see
+// ../../../plan-webapp/08-color-linking-inlay-hint-style.md.
 import { EditorView } from "@codemirror/view";
 
 export const inlayHintTheme = EditorView.baseTheme({
   ".cm-caos-inlay-hint": {
     color: "var(--caos-inlay-hint, #6e7781)",
     backgroundColor: "var(--caos-inlay-hint-bg, rgba(110, 119, 129, 0.12))",
-    borderRadius: "4px",
-    padding: "0 4px",
-    fontSize: "0.85em",
-    fontFamily: "inherit",
+    borderRadius: "var(--caos-inlay-hint-radius, 4px)",
+    padding: "var(--caos-inlay-hint-padding, 0 4px)",
+    fontSize: "var(--caos-inlay-hint-font-size, 0.85em)",
+    fontFamily: "var(--caos-inlay-hint-font-family, inherit)",
   },
   "&dark .cm-caos-inlay-hint": {
     color: "var(--caos-inlay-hint-dark, #8b949e)",
