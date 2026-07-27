@@ -50,13 +50,6 @@ export const TOKEN_KEYS: TokenKeyDef[] = [
   { key: "escape", label: "Escape sequence", category: "syntax", defaultLight: "#0550ae", defaultDark: "#79c0ff" },
   { key: "label", label: "Label", category: "syntax", defaultLight: "#8250df", defaultDark: "#d2a8ff" },
   { key: "keyword", label: "Control keyword", category: "syntax", defaultLight: "#cf222e", defaultDark: "#ff7b72" },
-  {
-    key: "command-heuristic",
-    label: "Command (unresolved heuristic)",
-    category: "syntax",
-    defaultLight: "#57606a",
-    defaultDark: "#8b949e",
-  },
   { key: "operator", label: "Compare operator", category: "syntax", defaultLight: "#cf222e", defaultDark: "#ff7b72" },
   { key: "command", label: "Command", category: "syntax", defaultLight: "#8250df", defaultDark: "#d2a8ff" },
   { key: "rvalue", label: "Rvalue", category: "syntax", defaultLight: "#0550ae", defaultDark: "#79c0ff" },
