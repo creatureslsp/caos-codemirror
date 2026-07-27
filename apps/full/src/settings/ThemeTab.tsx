@@ -216,7 +216,12 @@ export function ThemeTab({ client, legend }: ThemeTabProps) {
 
   function onModifierToggle(key: string, checked: boolean): void {
     if (checked) {
-      void setTokenColor(editingMode, key, DEFAULT_NEW_OVERRIDE_COLOR);
+      // Seed from the resolved color already showing (real for the
+      // type-as-modifier entries in token-keys.ts's exception -- rvalue,
+      // lvalue, caos2pray-tag, caos2pray-command -- since they have no
+      // parent type to fall through to; undefined, falling back to the
+      // generic gray, for a true modifier with nothing of its own yet).
+      void setTokenColor(editingMode, key, getResolvedTokenColor(editingMode, key) ?? DEFAULT_NEW_OVERRIDE_COLOR);
     } else {
       void clearTokenColor(editingMode, key);
     }
