@@ -56,7 +56,7 @@ function tokenKeyForClass(cls: string): string | null {
 // Semantic classification for every other construct in the file is
 // identical across all seven variants (verified empirically while writing
 // this phase), so this choice doesn't cost coverage of anything else.
-const PREVIEW_VARIANT: GameVariant = "C1";
+const PREVIEW_VARIANT: GameVariant = "DS";
 
 /** Wraps `client.fullAnalysis` so a request cancelled by the *main* editor's own edits (shared client, shared revision counter) gets silently retried instead of leaving this panel's decorations empty forever. */
 function retryOnCancellation(client: CaosEngineClient): CaosEngineClient {
