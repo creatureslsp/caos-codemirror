@@ -145,11 +145,11 @@ before assuming a blank slate at the start of a pass.
       Dark value does **not** change again.
 - [ ] Spot-check color reachability across all four `packages/editor` theme
       files, not just the syntax-color list in the tab: a Layer-1-only color
-      (e.g. "Comment"), a Layer-2 type (e.g. "Command"), and — via DevTools
-      (`document.documentElement.style` or the `--caos-*` computed styles,
-      since these two categories don't have dedicated Theme-tab rows yet,
-      Phase 08's territory) a touch-theme var (`--caos-panel-border`) and an
-      inlay-hint var (`--caos-inlay-hint`) all visibly change when set.
+      (e.g. "Comment"), a Layer-2 type (e.g. "Command"), the Theme tab's own
+      Inlay Hints section (`--caos-inlay-hint`, added Phase 08), and — via
+      DevTools (`document.documentElement.style` or the `--caos-*` computed
+      styles, since this category still has no dedicated Theme-tab row) a
+      touch-theme var (`--caos-panel-border`) all visibly change when set.
 - [ ] In the Theme tab's Modifiers section, check a modifier (e.g. "vaxx
       (event variable)") and set its color, *without* touching the
       "Variable" type color above: type CAOS containing both a plain
@@ -160,6 +160,34 @@ before assuming a blank slate at the start of a pass.
 - [ ] Then change the "Variable" type color itself (modifier still
       unchecked): the indexed-variable token's color follows the new type
       color too — confirms the fallthrough isn't a one-time snapshot.
+
+## Color linking + inlay-hint style (Phase 08)
+
+- [ ] In the Theme tab, note "Colors in use" shows "No custom colors set
+      yet" before any override exists; set a syntax color and confirm a
+      swatch + hex + token-label row appears there.
+- [ ] Click "Link…" on one syntax token (e.g. "Command"), pick another
+      token (e.g. "String") from the dropdown: the row switches to "Linked
+      to String" with a swatch matching String's current color, and an
+      "Unlink" button.
+- [ ] Change String's color: the linked Command row's swatch updates live
+      to match, with no page reload.
+- [ ] Click "Unlink" on Command: it reverts to a plain color picker holding
+      String's last-resolved color (not a reset to Command's hardcoded
+      default).
+- [ ] Link A → B, then try to link B → A: A does not appear in B's
+      link-target dropdown (cycle prevented at the option-list level, not
+      just on submit).
+- [ ] In the new "Inlay hints" section, set Text color and Background
+      color, then drag the simple "Transparency" slider: both the
+      background and text of an actual inlay hint in the editor become
+      more transparent together.
+- [ ] Open "Advanced": Background opacity/Text opacity sliders show the
+      same values the simple slider set, and can be moved independently.
+      Edit Padding/Border radius/Font family/Font size: the live editor's
+      inlay-hint pills reflect each change immediately.
+- [ ] "Reset to defaults" in Advanced reverts all inlay-hint style fields
+      (not colors) to their built-in values.
 
 ## Golden path
 

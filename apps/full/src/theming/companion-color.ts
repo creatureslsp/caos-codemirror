@@ -103,11 +103,25 @@ function toHex(n: number): string {
   return n.toString(16).padStart(2, "0");
 }
 
-function formatColor(rgb: { r: number; g: number; b: number }, a: number): string {
+export function formatColor(rgb: { r: number; g: number; b: number }, a: number): string {
   if (a >= 1) {
     return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
   }
   return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${a})`;
+}
+
+/**
+ * Reduces any recognized color format to a pure `#rrggbb` hex string,
+ * discarding alpha -- for feeding `<input type="color">`, which can't
+ * represent alpha itself. Phase 08's inlay-hint opacity sliders own
+ * transparency separately (`theme-store.ts`'s `InlayHintStyle`), so the
+ * color picker only ever needs to show/set the RGB portion even for tokens
+ * (like `inlay-hint-bg`) whose *default* literal is an `rgba()` string.
+ */
+export function toHexColor(input: string): string | null {
+  const parsed = parseColor(input);
+  if (!parsed) return null;
+  return `#${toHex(parsed.r)}${toHex(parsed.g)}${toHex(parsed.b)}`;
 }
 
 /**

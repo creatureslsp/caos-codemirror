@@ -208,6 +208,55 @@
       .theme-token-reset { font-size: 12px; }
       .theme-token-row--modifier { flex-wrap: wrap; }
       .theme-token-modifier-checkbox { flex: 1; min-width: 60%; }
+
+      /* Phase 08: color swatch, linked-token display, and link picker --
+         shared by TokenColorControl.tsx (per-row) and the palette list
+         below (recall-only, per docs/inspiration/README.md's
+         selectable-list-voice reference: leading swatch + label). */
+      .theme-swatch {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border-radius: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        flex-shrink: 0;
+      }
+      .theme-color-picker { display: inline-flex; align-items: center; gap: 6px; }
+      .theme-token-link-toggle { font-size: 12px; }
+      .theme-link-picker { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+      .theme-link-select { font-size: 12px; }
+      .theme-link-error { font-size: 11px; color: #cf222e; flex-basis: 100%; }
+      .theme-token-linked { display: inline-flex; align-items: center; gap: 6px; }
+      .theme-token-linked-label { font-size: 12px; font-style: italic; opacity: 0.8; }
+
+      .theme-palette-list { list-style: none; margin: 0 0 16px; padding: 0; }
+      .theme-palette-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        background: #f6f8fa;
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+      .theme-palette-hex { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; opacity: 0.8; }
+      .theme-palette-tokens { flex: 1; min-width: 100%; font-size: 12px; opacity: 0.7; }
+
+      .theme-inlay-hints { margin-top: 16px; }
+      .theme-slider-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        margin: 8px 0;
+      }
+      .theme-slider-row input[type="range"] { flex: 1; }
+      .theme-slider-value { min-width: 2.5em; text-align: right; font-size: 12px; opacity: 0.7; }
+      .theme-text-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; margin: 8px 0; }
+      .theme-text-row input[type="text"] { width: 8rem; }
+      .theme-advanced-toggle { font-size: 12px; margin-top: 4px; }
+      .theme-inlay-advanced { margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; }
     </style>
   </head>
   <body>
