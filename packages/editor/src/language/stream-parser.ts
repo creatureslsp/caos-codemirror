@@ -13,6 +13,7 @@ export interface CaosStreamState {
    * line — these directives never span lines, matching the tmLanguage
    * rule's own `(?=\n|$)` end anchor. */
   inCaos2Directive: boolean;
+  inCaos2DirectiveStart: boolean;
   /** Inside an opened, unclosed `"…"` string. Reset every line. */
   inQuoteString: boolean;
   /** Inside an opened, unclosed `[…]` bracket/byte-string span. Reset every line. */
@@ -108,6 +109,13 @@ function token(stream: StringStream, state: CaosStreamState): CaosTokenName | nu
 
   if (stream.eatSpace()) return null;
 
+  if (
+      state.inCaos2DirectiveStart &&
+      (stream.match(/^[ \t]*[^=\n]+(?=[ \t]*=)/) || stream.match(/^[ \t]*[^ \t\n]+/))) {
+      state.inCaos2DirectiveStart = false;
+    return "caos2Directive";
+  }
+
   if (state.inCaos2Directive) return caos2DirectiveToken(stream, state);
 
   if (state.atLineStart) {
@@ -119,20 +127,11 @@ function token(stream: StringStream, state: CaosStreamState): CaosTokenName | nu
     // the line, the key runs non-greedily up to it (spaces allowed inside,
     // e.g. "*#Agent Type = 0"); with no "=" at all, the key-only fallback
     // stops at the first space instead.
-    if (
-        stream.match(/^\*#/)
-    ) {
+    if (stream.match(/^\*#/)) {
       state.atLineStart = false;
       state.inCaos2Directive = true;
+      state.inCaos2DirectiveStart = true;
       return "caos2Hash";
-    }
-    if (
-      stream.match(/^\*#[ \t]*[^=\n]*?(?=[ \t]*=)/) ||
-      stream.match(/^\*#[ \t]*[^ \t\n]*/)
-    ) {
-      state.atLineStart = false;
-      state.inCaos2Directive = true;
-      return "caos2Directive";
     }
     if (stream.match(/^\*.*/)) {
       state.atLineStart = false;
@@ -185,6 +184,7 @@ export const caosStreamParser: StreamParser<CaosStreamState> = {
     return {
       atLineStart: true,
       inCaos2Directive: false,
+      inCaos2DirectiveStart: false,
       inQuoteString: false,
       inBracketString: false,
       afterLabelKeyword: false,
