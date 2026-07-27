@@ -89,7 +89,6 @@ function bracketStringToken(stream: StringStream, state: CaosStreamState): CaosT
 }
 
 function caos2DirectiveToken(stream: StringStream, state: CaosStreamState): CaosTokenName | null {
-  if (stream.match(/\*#\s*/)) return "caos2Hash";
   if (stream.match(/^=/)) return "caos2Eq";
   if (stream.match(/^"(?:\\.|[^"\\\n])*"?/)) return "string";
   if (stream.match(/^[^ \t\n]+/)) return "string";
