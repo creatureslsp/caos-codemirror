@@ -87,6 +87,7 @@ function bracketStringToken(stream: StringStream, state: CaosStreamState): CaosT
 }
 
 function caos2DirectiveToken(stream: StringStream, state: CaosStreamState): CaosTokenName | null {
+  if (stream.match(/\*#\s*/)) return "caos2Hash";
   if (stream.match(/^=/)) return "caos2Eq";
   if (stream.match(/^"(?:\\.|[^"\\\n])*"?/)) return "string";
   if (stream.match(/^[^ \t\n]+/)) return "string";
@@ -111,12 +112,19 @@ function token(stream: StringStream, state: CaosStreamState): CaosTokenName | nu
   if (state.atLineStart) {
     if (stream.match(/^\*\*(caos2pray|caos2cob)\b.*/i)) {
       state.atLineStart = false;
-      return "caos2Directive";
+      return "caos2Hash";
     }
     // Ported from tmLanguage's caos2statement: when a "=" appears later on
     // the line, the key runs non-greedily up to it (spaces allowed inside,
     // e.g. "*#Agent Type = 0"); with no "=" at all, the key-only fallback
     // stops at the first space instead.
+    if (
+        stream.match(/^\*#/)
+    ) {
+      state.atLineStart = false;
+      state.inCaos2Directive = true;
+      return "caos2Hash";
+    }
     if (
       stream.match(/^\*#[ \t]*[^=\n]*?(?=[ \t]*=)/) ||
       stream.match(/^\*#[ \t]*[^ \t\n]*/)

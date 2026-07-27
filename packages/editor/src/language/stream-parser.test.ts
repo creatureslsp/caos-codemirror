@@ -65,7 +65,8 @@ describe("caosStreamParser — CAOS2Pray mini-grammar", () => {
   it("tokenizes a key = quoted-value directive line", () => {
     const result = significant(tokenizeDoc('*#Name = "Foo"'));
     expect(result).toEqual([
-      { text: "*#Name", tag: "caos2Directive" },
+      { text: "*#", tag: "caos2Hash" },
+      { text: "Name", tag: "caos2Directive" },
       { text: "=", tag: "caos2Eq" },
       { text: '"Foo"', tag: "string" },
     ]);

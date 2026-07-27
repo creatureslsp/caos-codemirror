@@ -6,6 +6,7 @@ export const caosTags = {
   // Header line and directive key spans share processingInstruction / propertyName tags
   caos2Directive: tags.processingInstruction,
   caos2Eq: tags.propertyName,
+  caos2Hash: tags.comment,
   string: tags.string,
   escape: tags.escape,
   labelName: tags.labelName,

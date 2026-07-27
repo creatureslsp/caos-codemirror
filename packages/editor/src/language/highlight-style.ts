@@ -7,11 +7,12 @@ export const caosHighlightStyle = HighlightStyle.define([
   { tag: caosTags.lineComment, class: "cm-caos-comment" },
   { tag: caosTags.caos2Directive, class: "cm-caos-caos2-directive" },
   { tag: caosTags.caos2Eq, class: "cm-caos-caos2-eq" },
+  { tag: caosTags.caos2Hash, class: "cm-caos-caos2-hash" },
   { tag: caosTags.string, class: "cm-caos-string" },
   { tag: caosTags.escape, class: "cm-caos-escape" },
   { tag: caosTags.labelName, class: "cm-caos-label" },
   { tag: caosTags.controlKeyword, class: "cm-caos-keyword" },
-  { tag: caosTags.commandHeuristic, class: "cm-caos-command-heuristic" },
+  { tag: caosTags.commandHeuristic, class: "cm-caos-command" },
   { tag: caosTags.number, class: "cm-caos-number" },
   { tag: caosTags.compareOperator, class: "cm-caos-operator" },
 ]);
@@ -33,6 +34,9 @@ export const caosHighlightTheme = EditorView.baseTheme({
   ".cm-caos-caos2-eq": { color: "var(--caos-caos2-eq, #986801)" },
   "&dark .cm-caos-caos2-eq": { color: "var(--caos-caos2-eq-dark, #d29922)" },
 
+  ".cm-caos-caos2-hash": { color: "var(--caos-caos2-hash, #986801)" },
+  "&dark .cm-caos-caos2-hash": { color: "var(--caos-caos2-hash-dark, #d29922)" },
+
   ".cm-caos-string": { color: "var(--caos-string, #0a7d34)" },
   "&dark .cm-caos-string": { color: "var(--caos-string-dark, #7ee787)" },
 
@@ -47,8 +51,8 @@ export const caosHighlightTheme = EditorView.baseTheme({
 
   // Deliberately weaker than a Layer-2-confirmed command/rvalue/lvalue
   // color — see stream-parser.ts's header comment.
-  ".cm-caos-command-heuristic": { color: "var(--caos-command-heuristic, #57606a)" },
-  "&dark .cm-caos-command-heuristic": { color: "var(--caos-command-heuristic-dark, #8b949e)" },
+  ".cm-caos-command": { color: "var(--caos-command, #57606a)" },
+  "&dark .cm-caos-command": { color: "var(--caos-command-dark, #8b949e)" },
 
   ".cm-caos-number": { color: "var(--caos-number, #0550ae)" },
   "&dark .cm-caos-number": { color: "var(--caos-number-dark, #79c0ff)" },

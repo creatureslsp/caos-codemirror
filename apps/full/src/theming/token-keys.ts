@@ -46,6 +46,7 @@ export const TOKEN_KEYS: TokenKeyDef[] = [
     defaultDark: "#d29922",
   },
   { key: "caos2-eq", label: "CAOS2 \"=\"", category: "syntax", defaultLight: "#986801", defaultDark: "#d29922" },
+  { key: "caos2-hash", label: "CAOS2 \"*#\"", category: "syntax", defaultLight: "#986801", defaultDark: "#d29922" },
   { key: "escape", label: "Escape sequence", category: "syntax", defaultLight: "#0550ae", defaultDark: "#79c0ff" },
   { key: "label", label: "Label", category: "syntax", defaultLight: "#8250df", defaultDark: "#d2a8ff" },
   { key: "keyword", label: "Control keyword", category: "syntax", defaultLight: "#cf222e", defaultDark: "#ff7b72" },
