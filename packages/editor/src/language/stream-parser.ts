@@ -33,7 +33,8 @@ const CONTROL_KEYWORDS = new Set([
   "doif", "elif", "else", "endi",
   "reps", "repe",
   "loop", "untl", "ever",
-  "enum", "next", "subr", "retn", "scrp", "iscr", "rscr",
+  "enum", "next", "subr", "retn",
+  "scrp", "iscr", "rscr", "endm",
   "etch", "esee", "epas", "econ", "elst", "escn", "nscn",
 ]);
 
