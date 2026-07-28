@@ -4,6 +4,7 @@ import type { CaosFile } from "../storage/files.js";
 import type { CaosProject } from "../storage/projects.js";
 import { getEffectiveVariant } from "../storage/projects.js";
 import { formatRelativeDate } from "./format.js";
+import { MoreVertIcon } from "../icons.js";
 
 export interface FileListProps {
   files: CaosFile[];
@@ -100,7 +101,7 @@ export function FileList(props: FileListProps) {
                 aria-expanded={isMenuOpen}
                 onClick={() => setOpenMenuId(isMenuOpen ? null : file.id)}
               >
-                ⋮
+                <MoreVertIcon />
               </button>
               {isMenuOpen && (
                 <div class="files-row-menu" role="menu" ref={menuRef}>

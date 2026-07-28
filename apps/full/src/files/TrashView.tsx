@@ -2,6 +2,7 @@
 import type { CaosFile } from "../storage/files.js";
 import type { CaosProject } from "../storage/projects.js";
 import { formatRelativeDate } from "./format.js";
+import { FolderIcon } from "../icons.js";
 
 export interface TrashViewProps {
   trashedFiles: CaosFile[];
@@ -21,8 +22,9 @@ export function TrashView(props: TrashViewProps) {
     <ul class="files-trash-list">
       {trashedProjects.map((project) => (
         <li key={`project-${project.id}`} class="files-row">
-          <span class="files-row-name">
-            📁 {project.name}
+          <span class="files-row-name files-row-name--trashed-project">
+            <FolderIcon />
+            {project.name}
             <span class="files-row-meta">deleted {formatRelativeDate(project.deletedDate ?? Date.now())}</span>
           </span>
           <button type="button" onClick={() => onRestoreProject(project.id)}>

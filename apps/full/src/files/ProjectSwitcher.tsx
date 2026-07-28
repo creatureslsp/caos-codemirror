@@ -3,6 +3,7 @@ import { useState } from "preact/hooks";
 import type { GameVariant } from "@creatures-codemirror/engine";
 import { GAME_VARIANTS } from "@creatures-codemirror/engine";
 import type { CaosProject } from "../storage/projects.js";
+import { CloseIcon } from "../icons.js";
 
 export interface ProjectSwitcherProps {
   projects: CaosProject[];
@@ -95,7 +96,7 @@ export function ProjectSwitcher(props: ProjectSwitcherProps) {
                   onRequestDeleteProject(project);
                 }}
               >
-                ×
+                <CloseIcon />
               </span>
             </button>
           )

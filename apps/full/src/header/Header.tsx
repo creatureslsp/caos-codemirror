@@ -17,7 +17,7 @@ import { createFile, NameConflictError, type CaosFile } from "../storage/files.j
 import { getEffectiveVariant, getProject } from "../storage/projects.js";
 import { kvGet, kvSet } from "../storage/db.js";
 import { downloadAsCosFile, pickCosFileFromDisk } from "../files/file-io.js";
-import { NewFileIcon, OpenFileIcon, DownloadIcon } from "../files/icons.js";
+import { NewFileIcon, OpenFileIcon, DownloadIcon, ExpandMoreIcon } from "../icons.js";
 import { ConfirmMoveDialog } from "../files/ConfirmMoveDialog.js";
 import { activeFile, currentVariant, pendingVariantPrompt, activeProject } from "../files/active-file-store.js";
 import { browsingProjectId } from "../files/browsing-state.js";
@@ -128,7 +128,9 @@ export function Header(props: HeaderProps) {
         onClick={() => setFilePopoverOpen((open) => !open)}
       >
         <span class="app-header-filename-text">{file?.name ?? "Untitled"}</span>
-        <span class="app-header-filename-caret">▾</span>
+        <span class="app-header-filename-caret">
+          <ExpandMoreIcon />
+        </span>
       </button>
 
       <div class="app-header-actions">

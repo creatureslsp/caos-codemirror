@@ -1,5 +1,6 @@
 /** Sort-field + direction control shared by the project and file lists. */
 import type { SortDirection, SortField } from "../storage/search.js";
+import { ArrowDownwardIcon, ArrowUpwardIcon } from "../icons.js";
 
 export interface SortControlProps {
   sortBy: SortField;
@@ -31,10 +32,11 @@ export function SortControl(props: SortControlProps) {
       </select>
       <button
         type="button"
+        class="icon-btn"
         aria-label={sortDirection === "asc" ? "Ascending" : "Descending"}
         onClick={() => onChange(sortBy, sortDirection === "asc" ? "desc" : "asc")}
       >
-        {sortDirection === "asc" ? "↑" : "↓"}
+        {sortDirection === "asc" ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
       </button>
     </div>
   );

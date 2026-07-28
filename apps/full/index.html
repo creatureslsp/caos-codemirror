@@ -50,7 +50,8 @@
       }
       .app-header-filename:hover { background: rgba(0, 0, 0, 0.06); }
       .app-header-filename-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .app-header-filename-caret { font-size: 10px; opacity: 0.6; flex: none; }
+      .app-header-filename-caret { display: inline-flex; opacity: 0.6; flex: none; }
+      .app-header-filename-caret svg { width: 16px; height: 16px; }
       .app-header-actions { display: flex; align-items: center; gap: 4px; flex: none; }
       .app-header-variant {
         font: inherit;
@@ -140,8 +141,9 @@
         height: 56px;
         border-radius: 50%;
         border: none;
-        font-size: 24px;
-        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background: #222;
         color: #fff;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -151,6 +153,7 @@
         z-index: 450;
         transition: bottom 0.15s ease;
       }
+      .shell-menu-button svg { width: 26px; height: 26px; }
       /* Clear of the log pane's top edge so it never overlaps (and traps) the button. */
       .shell-menu-button--log-open {
         bottom: calc(40vh + 16px);
@@ -255,8 +258,7 @@
         line-height: 1;
       }
       .icon-btn svg { width: 18px; height: 18px; scale: 160%; }
-      .shell-sheet button.icon-btn.shell-sheet-close { font-size: 1.6em !important; width:30px !important; height:30px !important; }
-      .shell-sheet button.icon-btn.shell-sheet-close .shell-sheet-close-icon { display:block; margin-top:-3px; }
+      .shell-sheet button.icon-btn.shell-sheet-close { width: 30px !important; height: 30px !important; }
 
 
       .settings-tab-strip { margin-bottom: 12px; }
@@ -303,7 +305,8 @@
         gap: 6px;
       }
       .files-project-chip--active { background: #222; color: #fff; border-color: #222; }
-      .files-project-delete { opacity: 0.6; font-weight: bold; }
+      .files-project-delete { display: inline-flex; opacity: 0.6; margin-left: 2px; vertical-align: -3px; }
+      .files-project-delete svg { width: 14px; height: 14px; }
       .files-project-delete:hover { opacity: 1; }
       .files-project-create-button { font-size: 13px; }
       .files-project-create-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
@@ -320,6 +323,8 @@
       }
       .files-row--active { background: #f5f8ff; }
       .files-row-name { flex: 1; text-align: left; background: none; border: none; padding: 0; color: var(--block-text-color)}
+      .files-row-name--trashed-project { display: flex; align-items: center; gap: 6px; }
+      .files-row-name--trashed-project svg { width: 16px; height: 16px; flex: none; opacity: 0.7; }
       .files-row-meta { display: block; font-size: 11px; opacity: 0.65; }
       .files-row-actions { position: relative; display: flex; align-items: center; }
       .files-row-move { flex-basis: 100%; }

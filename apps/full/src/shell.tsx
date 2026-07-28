@@ -2,6 +2,7 @@
 import type { ComponentChildren, RefCallback } from "preact";
 import type { Signal } from "@preact/signals";
 import { useState } from "preact/hooks";
+import { CloseIcon, MenuIcon } from "./icons.js";
 
 export type SheetSection = "files" | "settings";
 
@@ -39,7 +40,7 @@ export function Shell(props: ShellProps): ComponentChildren {
         aria-expanded={menuOpen}
         onClick={() => setMenuOpen((open) => !open)}
       >
-        ☰
+        <MenuIcon />
       </button>
 
       {/* Always mounted (only visibility toggles), same reasoning as the
@@ -63,7 +64,7 @@ export function Shell(props: ShellProps): ComponentChildren {
               aria-label="Dismiss menu"
               onClick={() => setMenuOpen(false)}
             >
-              <span class="shell-sheet-close-icon">×</span>
+              <CloseIcon />
             </button>
           </div>
           <div class="segmented-control shell-sheet-nav" role="tablist">
