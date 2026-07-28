@@ -63,7 +63,20 @@
         padding: 6px 4px;
       }
 
-      .header-icon-btn { width: 32px; height: 32px; }
+      /* Matches the menu sheet's own button chrome (`.shell-sheet button`
+         below) so the always-visible header reads as the same system as the
+         sheet it opens, instead of looking like a bare, unstyled toolbar. */
+      .header-icon-btn {
+        width: 32px;
+        height: 32px;
+        font: inherit;
+        color: inherit;
+        background: #f2f2f4;
+        border: 1px solid #d8d8dc;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .header-icon-btn:hover { background: #e6e6ea; }
 
       /* Popovers anchored under the header (file select, "..." file actions,
          move-destination select) -- own z-index tier above the header bar
@@ -124,6 +137,8 @@
       :root[data-theme="dark"] .app-header { background: #262b3d; border-bottom-color: #3a3f55; }
       :root[data-theme="dark"] .app-header-filename:hover { background: rgba(255, 255, 255, 0.08); }
       :root[data-theme="dark"] .app-header-variant { background: #2f3548; border-color: #3a3f55; color: #e6e6ef; }
+      :root[data-theme="dark"] .header-icon-btn { background: #2f3548; border-color: #3a3f55; color: #e6e6ef; }
+      :root[data-theme="dark"] .header-icon-btn:hover { background: #3a4160; }
       :root[data-theme="dark"] .header-file-popover,
       :root[data-theme="dark"] .header-dropdown {
         background: #262b3d;
