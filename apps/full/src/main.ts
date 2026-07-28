@@ -274,6 +274,11 @@ async function main(): Promise<void> {
   // props (initResponse-derived ids/defaults, the stable view.dispatch-based
   // callback) don't depend on activeFile/activeProject/currentVariant.
   SETTINGS_TABS.push({
+    id: "theme",
+    label: "Theme",
+    render: () => h(ThemeTab, { client, legend: initResponse.semanticTokensLegend }),
+  });
+  SETTINGS_TABS.push({
     id: "inlay-hints",
     label: "Inlay Hints",
     render: () =>
@@ -286,11 +291,6 @@ async function main(): Promise<void> {
           log("Inlay hint options changed:", options);
         },
       }),
-  });
-  SETTINGS_TABS.push({
-    id: "theme",
-    label: "Theme",
-    render: () => h(ThemeTab, { client, legend: initResponse.semanticTokensLegend }),
   });
   settingsBody.value = h(SettingsPanel, null);
 
