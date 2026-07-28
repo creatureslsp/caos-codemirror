@@ -160,6 +160,26 @@ before assuming a blank slate at the start of a pass.
 - [ ] Then change the "Variable" type color itself (modifier still
       unchecked): the indexed-variable token's color follows the new type
       color too — confirms the fallthrough isn't a one-time snapshot.
+- [ ] Switching to "Dark" (either the top mode switcher or OS-driven
+      "System") changes the **app's own background**, not just editor text
+      colors — the menu sheet, dialogs, and the editor's own background all
+      go dark, not just syntax coloring. (Regression check: this was broken
+      for a while — CM6's `&dark` selector only ever drove text color, never
+      the app shell chrome.)
+- [ ] Pick a distinct color for a type that another element always visually
+      wraps (e.g. set "Command" to something unmistakable) and confirm it's
+      actually visible, not hidden behind a nested element's own default —
+      type a command word and a `.`-shaped 4-char identifier and confirm
+      both show the new color, not the old default. (Regression check: CM6
+      nests same-range decorations from different sources as separate DOM
+      spans rather than merging classes, so a color set on the *outer* span
+      can be silently invisible behind the *inner* span's own default if the
+      CSS doesn't specifically account for it.)
+- [ ] With "Command rvalue"/"Command lvalue"/"CAOS2PRAY tag" left unchecked
+      in the Modifiers section, confirm they render using "Command"'s (or
+      "CAOS2 directive"'s) *current* color, not a fixed independent default
+      — change "Command"'s color and confirm rvalue/lvalue-classified tokens
+      follow it with no override of their own.
 
 ## Color linking + inlay-hint style (Phase 08)
 
