@@ -4,7 +4,7 @@
 *# color = "red"
 
 * Animate if red
-doif name "color" = "red"
+doif name "color" = "red" and velx gt 10
 	setv _p1_ 10
 	anim [1 2 3 2 1 255]
 endi
@@ -12,6 +12,7 @@ endi
 dde: pict Y|D
 dde: puts [Hello Panda!]
 dde: getb cnam
+setv var0 tokn mum1
 
 new: simp 1 1 2 "blnk" 1 1 8000
 
