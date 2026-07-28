@@ -39,55 +39,61 @@ export function Shell(props: ShellProps): ComponentChildren {
         ☰
       </button>
 
-      {menuOpen && (
-        <div class="shell-sheet-backdrop" onClick={() => setMenuOpen(false)}>
-          <div class="shell-sheet" onClick={(event) => event.stopPropagation()}>
-            <div class="shell-sheet-header">
-              <h2>Menu</h2>
-              <button type="button" onClick={() => setLogOpen((open) => !open)}>
-                {logOpen ? "Hide log" : "Show log"}
-              </button>
+      {/* Always mounted (only visibility toggles), same reasoning as the
+          files/settings section toggle below: conditionally rendering this
+          backdrop with `{menuOpen && ...}` would unmount FileBrowser every
+          time the sheet closes, wiping its internal state (activeProjectId,
+          search, sort, trash view) back to defaults on next open. */}
+      <div
+        class={menuOpen ? "shell-sheet-backdrop" : "shell-sheet-backdrop shell-sheet-backdrop-hidden"}
+        onClick={() => setMenuOpen(false)}
+      >
+        <div class="shell-sheet" onClick={(event) => event.stopPropagation()}>
+          <div class="shell-sheet-header">
+            <h2>Menu</h2>
+            <button type="button" onClick={() => setLogOpen((open) => !open)}>
+              {logOpen ? "Hide log" : "Show log"}
+            </button>
+            <button
+              type="button"
+              class="icon-btn shell-sheet-close"
+              aria-label="Dismiss menu"
+              onClick={() => setMenuOpen(false)}
+            >
+              <span class="shell-sheet-close-icon">×</span>
+            </button>
+          </div>
+          <div class="segmented-control shell-sheet-nav" role="tablist">
+            {SHEET_SECTIONS.map((section) => (
               <button
                 type="button"
-                class="icon-btn shell-sheet-close"
-                aria-label="Dismiss menu"
-                onClick={() => setMenuOpen(false)}
+                role="tab"
+                key={section.id}
+                aria-selected={section.id === activeSection}
+                class={
+                  section.id === activeSection
+                    ? "segmented-control-segment segmented-control-segment--active"
+                    : "segmented-control-segment"
+                }
+                onClick={() => setActiveSection(section.id)}
               >
-                <span class="shell-sheet-close-icon">×</span>
+                {section.label}
               </button>
-            </div>
-            <div class="segmented-control shell-sheet-nav" role="tablist">
-              {SHEET_SECTIONS.map((section) => (
-                <button
-                  type="button"
-                  role="tab"
-                  key={section.id}
-                  aria-selected={section.id === activeSection}
-                  class={
-                    section.id === activeSection
-                      ? "segmented-control-segment segmented-control-segment--active"
-                      : "segmented-control-segment"
-                  }
-                  onClick={() => setActiveSection(section.id)}
-                >
-                  {section.label}
-                </button>
-              ))}
-            </div>
-            {/* Both always mounted (only visibility toggles), like #log below --
-                so FileBrowser/SettingsPanel's own internal state (and, for
-                Settings, the live inlay-hint checkbox state) survives
-                switching sections, instead of resetting to its initial
-                value on every remount. */}
-            <div class={activeSection === "files" ? "shell-sheet-body" : "shell-sheet-body shell-sheet-body-hidden"}>
-              {filesBody.value}
-            </div>
-            <div class={activeSection === "settings" ? "shell-sheet-body" : "shell-sheet-body shell-sheet-body-hidden"}>
-              {settingsBody.value}
-            </div>
+            ))}
+          </div>
+          {/* Both always mounted (only visibility toggles), like #log below --
+              so FileBrowser/SettingsPanel's own internal state (and, for
+              Settings, the live inlay-hint checkbox state) survives
+              switching sections, instead of resetting to its initial
+              value on every remount. */}
+          <div class={activeSection === "files" ? "shell-sheet-body" : "shell-sheet-body shell-sheet-body-hidden"}>
+            {filesBody.value}
+          </div>
+          <div class={activeSection === "settings" ? "shell-sheet-body" : "shell-sheet-body shell-sheet-body-hidden"}>
+            {settingsBody.value}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Always mounted (only visibility toggles) so main.ts's cached #log node/textContent
           survives across open/close — matches log()'s existing append-only behavior. */}
