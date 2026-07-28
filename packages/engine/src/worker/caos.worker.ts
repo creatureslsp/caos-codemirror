@@ -100,7 +100,7 @@ async function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): 
         parseResult,
         request.disabledInlayHints ?? [],
         request.minimumParameterCount,
-        1,
+        0,
       );
       const response: FullAnalysisResponse = {
         id: request.id,
