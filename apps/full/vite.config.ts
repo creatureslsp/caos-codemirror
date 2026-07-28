@@ -5,6 +5,11 @@ import { VitePWA } from "vite-plugin-pwa";
 
 const repoRoot = fileURLToPath(new URL("../../..", import.meta.url));
 export default defineConfig({
+  // Relative so the build works when hosted under an arbitrary/unknown
+  // subpath rather than domain root -- all emitted asset URLs, the SW
+  // registration script, and the manifest end up relative instead of
+  // root-absolute (`/assets/...`).
+  base: "./",
   plugins: [
     preact(),
     VitePWA({
@@ -43,7 +48,9 @@ export default defineConfig({
         // No runtime API calls anywhere in this app (everything is local/
         // IndexedDB) -- precache is the whole caching story, nothing else
         // needs a runtime-caching route.
-        navigateFallbackDenylist: [/^\/bench/],
+        // Path-suffix match (not anchored to `/`) since `base` is relative --
+        // the deployed pathname is `<subpath>/bench/...`, not `/bench/...`.
+        navigateFallbackDenylist: [/\/bench\//],
       },
     }),
   ],
