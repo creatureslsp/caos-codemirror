@@ -28,13 +28,73 @@ function toMessage(d: CaosDiagnostic): string {
   return parts.join("\n");
 }
 
+declare type CreateElementOpts = {
+  init?: (element: HTMLElement) => void,
+  contents?: string
+  isHTML?: boolean
+} | ((element: HTMLElement) => void) | string | Element[];
+
+function createElement(tag: string, opts: CreateElementOpts, init?: (element: HTMLElement) => void): HTMLElement {
+  const out = document.createElement(tag);
+  if (typeof opts === "string") {
+    out.innerText = opts;
+  } else if (Array.isArray(opts)) {
+    for (const element of opts) {
+      out.appendChild(element);
+    }
+  } else if (typeof opts === "object") {
+    const {init, contents, isHTML} = opts;
+    if (contents != null) {
+      if (isHTML) {
+        out.innerHTML = contents;
+      } else {
+        out.innerText = contents;
+      }
+    }
+    if (init) {
+      init(out);
+    }
+  } else if (typeof opts === "function") {
+      opts(out);
+  }
+  if (init) {
+    init(out)
+  }
+  return out;
+}
+
+function monospacedSpan(text: string) {
+  return createElement("span", text, (e) => {
+    e.classList.add("font-monospaced")
+  })
+}
+
+function toMessageElement(d: CaosDiagnostic) {
+  const parts: HTMLElement[] = [createElement("span", d.message)];
+
+  if (d.source?.lineText && d.source.marker) {
+    parts.push(monospacedSpan(d.source.lineText));
+    parts.push(monospacedSpan(d.source!.marker));
+  }
+
+  return createElement("div", (out) => {
+    for (const part of parts) {
+      out.append(part)
+      out.append(document.createElement("br"))
+    }
+  });
+}
+
 export function toCM6Diagnostic(d: CaosDiagnostic, doc: Text): CM6Diagnostic {
   const { from, to } = adjustForIndexing(d.location, doc);
   return {
     from,
     to,
     severity: d.severity,
-    message: toMessage(d),
     source: d.code,
+    message: toMessage(d),
+    renderMessage() {
+      return toMessageElement(d);
+    }
   };
 }
