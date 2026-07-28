@@ -6,13 +6,131 @@
     <meta name="theme-color" content="#1e212b" />
     <title>CAOS Editor</title>
     <style>
-      :root { color-scheme: light dark; }
+      :root { color-scheme: light dark; --app-header-height: 48px; }
       html, body { height: 100%; margin: 0; font-family: system-ui, sans-serif; }
       body { overflow: hidden; background: #fff; color: #111; }
       #app { position: fixed; inset: 0; }
 
-      .shell-editor { position: absolute; inset: 0; }
+      .shell-editor { position: absolute; top: var(--app-header-height); left: 0; right: 0; bottom: 0; }
       .shell-editor .cm-editor { height: 100%; background: #fff; }
+
+      /* Persistent header bar (filename/select, new/open/download, variant,
+         file actions) -- always visible, unlike the hamburger sheet below,
+         which stays hidden until opened. Sits above CodeMirror's own content
+         but below the sheet backdrop/dialogs (z-index 500/600) so opening
+         the sheet still visually covers it. */
+      .app-header-slot { position: fixed; top: 0; left: 0; right: 0; z-index: 420; }
+      .app-header {
+        height: var(--app-header-height);
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 8px;
+        background: #f6f6f8;
+        border-bottom: 1px solid #d8d8dc;
+        position: relative;
+      }
+      .app-header-filename {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font: inherit;
+        font-weight: 600;
+        font-size: 14px;
+        color: inherit;
+        background: none;
+        border: none;
+        padding: 6px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: left;
+      }
+      .app-header-filename:hover { background: rgba(0, 0, 0, 0.06); }
+      .app-header-filename-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .app-header-filename-caret { font-size: 10px; opacity: 0.6; flex: none; }
+      .app-header-actions { display: flex; align-items: center; gap: 4px; flex: none; }
+      .app-header-variant {
+        font: inherit;
+        font-size: 12px;
+        border: 1px solid #d8d8dc;
+        border-radius: 8px;
+        background: #fff;
+        color: inherit;
+        padding: 6px 4px;
+      }
+
+      .header-icon-btn { width: 32px; height: 32px; }
+
+      /* Popovers anchored under the header (file select, "..." file actions,
+         move-destination select) -- own z-index tier above the header bar
+         itself, below the sheet/dialogs. */
+      .header-file-popover {
+        position: absolute;
+        top: 100%;
+        left: 8px;
+        right: 8px;
+        z-index: 430;
+        background: #fff;
+        border: 1px solid #d8d8dc;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 8px;
+        max-height: 60vh;
+        overflow: auto;
+        box-sizing: border-box;
+      }
+      .header-file-popover-list { list-style: none; margin: 4px 0 0; padding: 0; }
+      .header-file-popover-list .files-row-name { display: block; width: 100%; padding: 6px 4px; }
+      .header-file-popover-list .files-row-name.files-row--active { background: #f5f8ff; border-radius: 6px; }
+
+      .header-active-file-menu { position: relative; }
+      .header-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        z-index: 430;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 140px;
+        background: #fff;
+        border: 1px solid #d8d8dc;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 4px;
+      }
+      .header-dropdown button {
+        font: inherit;
+        color: inherit;
+        background: #f2f2f4;
+        border: 1px solid #d8d8dc;
+        border-radius: 6px;
+        padding: 6px 8px;
+        font-size: 13px;
+        cursor: pointer;
+        justify-content: flex-start;
+        width: 100%;
+        text-align: left;
+      }
+      .header-dropdown button:hover { background: #e6e6ea; }
+      .header-move-dropdown { padding: 8px; min-width: 180px; }
+      .header-move-dropdown select { width: 100%; }
+
+      /* Header + its popovers/dropdowns in dark mode. */
+      :root[data-theme="dark"] .app-header { background: #262b3d; border-bottom-color: #3a3f55; }
+      :root[data-theme="dark"] .app-header-filename:hover { background: rgba(255, 255, 255, 0.08); }
+      :root[data-theme="dark"] .app-header-variant { background: #2f3548; border-color: #3a3f55; color: #e6e6ef; }
+      :root[data-theme="dark"] .header-file-popover,
+      :root[data-theme="dark"] .header-dropdown {
+        background: #262b3d;
+        border-color: #3a3f55;
+      }
+      :root[data-theme="dark"] .header-file-popover-list .files-row-name.files-row--active { background: #262b45; }
+      :root[data-theme="dark"] .header-dropdown button { background: #2f3548; border-color: #3a3f55; color: #e6e6ef; }
+      :root[data-theme="dark"] .header-dropdown button:hover { background: #3a4160; }
 
       .shell-menu-button {
         position: fixed;
@@ -170,7 +288,6 @@
       .file-browser { border-bottom: 1px solid #ddd; padding-bottom: 12px; margin-bottom: 12px; }
       .file-browser-toolbar { display: flex; gap: 8px; margin-bottom: 8px; }
       .files-search-bar { flex: 1; min-width: 0; }
-      .file-browser-file-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
 
       .files-project-switcher { margin-bottom: 8px; }
       .files-project-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }

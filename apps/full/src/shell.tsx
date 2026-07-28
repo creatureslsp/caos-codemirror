@@ -11,6 +11,8 @@ export interface ShellProps {
   filesBody: Signal<ComponentChildren>;
   /** Settings tab container (Phase 06). */
   settingsBody: Signal<ComponentChildren>;
+  /** Persistent header bar: filename/select, new/open/download, variant, file actions. */
+  headerBody: Signal<ComponentChildren>;
 }
 
 const SHEET_SECTIONS: { id: SheetSection; label: string }[] = [
@@ -19,13 +21,14 @@ const SHEET_SECTIONS: { id: SheetSection; label: string }[] = [
 ];
 
 export function Shell(props: ShellProps): ComponentChildren {
-  const { editorContainerRef, filesBody, settingsBody } = props;
+  const { editorContainerRef, filesBody, settingsBody, headerBody } = props;
   const [menuOpen, setMenuOpen] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<SheetSection>("files");
 
   return (
     <>
+      <div class="app-header-slot">{headerBody.value}</div>
       <div ref={editorContainerRef} id="editor" class="shell-editor" />
 
       <button
