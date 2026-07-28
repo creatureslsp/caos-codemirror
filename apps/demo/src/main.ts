@@ -132,7 +132,6 @@ async function main(): Promise<void> {
         mobileHoverTrigger(),
         mobileViewport(),
         touchTheme,
-        completionTrigger(),
         EditorView.updateListener.of((update) => {
           panel.setDiagnosticsCount(diagnosticCount(update.state));
         }),

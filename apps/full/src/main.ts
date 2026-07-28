@@ -11,7 +11,6 @@ import {
   caosHoverTooltip,
   caosLanguageSupport,
   caosLinter,
-  completionTrigger,
   DEFAULT_INLAY_HINT_OPTIONS,
   inlayHints,
   inlayHintTheme,
@@ -242,7 +241,6 @@ async function main(): Promise<void> {
         mobileHoverTrigger(),
         mobileViewport(),
         touchTheme,
-        completionTrigger(),
         autosave.extension,
         EditorView.updateListener.of((update) => {
           diagnosticsCount.value = diagnosticCount(update.state);
