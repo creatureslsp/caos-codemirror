@@ -24,6 +24,10 @@ export const caosHighlightStyle = HighlightStyle.define([
 // names semantic-tokens-theme.ts already defines for its Layer-2
 // `string`/`number` token types (same colors today) rather than minting
 // Layer-1-only duplicates, so a single override colors both layers.
+// `--caos-escape`/`--caos-label` were dropped the same way in favor of
+// Layer 2's `--caos-string-escape-character`/`--caos-subroutine-name` --
+// same reasoning as `--caos-command` below, one control instead of two
+// that always agreed anyway.
 export const caosHighlightTheme = EditorView.baseTheme({
   ".cm-caos-comment": { color: "var(--caos-comment, #6a737d)", fontStyle: "italic" },
   "&dark .cm-caos-comment": { color: "var(--caos-comment-dark, #8b949e)" },
@@ -40,11 +44,11 @@ export const caosHighlightTheme = EditorView.baseTheme({
   ".cm-caos-string": { color: "var(--caos-string, #0a7d34)" },
   "&dark .cm-caos-string": { color: "var(--caos-string-dark, #7ee787)" },
 
-  ".cm-caos-escape": { color: "var(--caos-escape, #0550ae)", fontWeight: "bold" },
-  "&dark .cm-caos-escape": { color: "var(--caos-escape-dark, #79c0ff)" },
+  ".cm-caos-escape": { color: "var(--caos-string-escape-character, #0550ae)", fontWeight: "bold" },
+  "&dark .cm-caos-escape": { color: "var(--caos-string-escape-character-dark, #79c0ff)" },
 
-  ".cm-caos-label": { color: "var(--caos-label, #8250df)", fontWeight: "bold" },
-  "&dark .cm-caos-label": { color: "var(--caos-label-dark, #d2a8ff)" },
+  ".cm-caos-label": { color: "var(--caos-subroutine-name, #8250df)", fontWeight: "bold" },
+  "&dark .cm-caos-label": { color: "var(--caos-subroutine-name-dark, #d2a8ff)" },
 
   ".cm-caos-keyword": { color: "var(--caos-keyword, #cf222e)", fontWeight: "bold" },
   "&dark .cm-caos-keyword": { color: "var(--caos-keyword-dark, #ff7b72)" },

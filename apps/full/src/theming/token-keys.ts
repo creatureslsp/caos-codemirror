@@ -12,26 +12,43 @@
  *
  * `--caos-string` and `--caos-number` are shared between Layer 1 and Layer 2
  * (both already used the same colors before this phase) — listed once, in
- * the `syntax` category, not duplicated.
+ * the `syntax` category, not duplicated. `escape`/`label` (Layer 1 only)
+ * were deliberately dropped the same way and merged into their Layer 2
+ * counterparts instead of getting their own keys: `.cm-caos-escape` now
+ * reads `--caos-string-escape-character` and `.cm-caos-label` reads
+ * `--caos-subroutine-name` (`highlight-style.ts`) — same pairing
+ * `command`/`command-heuristic` already used before that key was merged
+ * outright. One color, one control, immediate Layer 1 heuristic and
+ * confirmed Layer 2 classification always agree (no flash of a different
+ * color once analysis lands).
  *
- * Modifier keys (`category: "modifier"`) usually default to `inherit` in the
- * CSS (see semantic-tokens-theme.ts) rather than a concrete color — there's
- * no meaningful "default swatch" for them the way there is for a type color,
- * only "not overridden, falls through to the type color". Per
- * `00-risks-and-open-questions.md` items 9-10: this is every declared
- * modifier in `semantics-legend.ts` except `c1-string`, confirmed dead in
- * practice.
+ * Modifier keys (`category: "modifier"`) have no `defaultLight`/`defaultDark`
+ * of their own — deliberately. Every one of them decorates a span that's
+ * always nested *inside* another element's own span (a Layer 1 base-type
+ * span, or another Layer 2 type/modifier), per `build-decorations.ts`/CM6's
+ * own decoration nesting -- see `semantic-tokens-theme.ts`'s module comment
+ * for why that nesting happens and how the CSS `<selector> span` rules
+ * resolve it. Left unset, a modifier is meant to be invisible: the wrapped
+ * element's own color shows through untouched. `fallbackKey` records *which*
+ * element it wraps, purely so `getResolvedTokenColor` (and therefore
+ * `TokenColorControl`'s swatch, and `ThemeTab`'s "seed a newly-checked
+ * modifier box from its current color" behavior) can show the same color the
+ * editor already renders instead of a meaningless generic gray -- it has no
+ * effect on the actual CSS, which is what `semantic-tokens-theme.ts`'s own
+ * `var(--caos-<key>, var(--caos-<fallbackKey>, ...))` chains already encode
+ * independently.
  *
- * Exception: `rvalue`/`lvalue`/`caos2pray-tag`/`caos2pray-command` are
- * `category: "modifier"` too (moved out of `syntax` to declutter that list)
- * but are actually semantic *types* (`.cm-caos-sem-rvalue` etc., real CSS
- * rules with their own hardcoded fallback in `semantic-tokens-theme.ts`),
- * not real modifiers layered on top of one — there's no parent type for them
- * to fall through to, so unlike a true modifier they keep their real
- * `defaultLight`/`defaultDark` here. This is what lets `TokenColorControl`
- * show their actual rendered color instead of a misleading gray before the
- * user has overridden them, and what lets `ThemeTab`'s modifier-checkbox
- * seed a newly-checked box with that real color rather than a generic one.
+ * `rvalue`/`lvalue`/`caos2pray-tag`/`caos2pray-command` are `category:
+ * "modifier"` for exactly this reason (moved out of `syntax`, not just to
+ * declutter that list): `rvalue`/`lvalue` always wrap Layer 1's
+ * `.cm-caos-command` heuristic span (`fallbackKey: "command"`);
+ * `caos2pray-tag`/`caos2pray-command` always wrap Layer 1's
+ * `.cm-caos-caos2-directive` span (`fallbackKey: "caos2-directive"`). Per
+ * `00-risks-and-open-questions.md` items 9-10, every *true* modifier
+ * declared in `semantics-legend.ts` (except `c1-string`, confirmed dead) is
+ * here too, without a `fallbackKey` -- `getResolvedTokenColor` returning
+ * `undefined` for those is fine as-is (existing, unflagged behavior), not
+ * something this exception list changes.
  */
 
 export type TokenCategory = "syntax" | "modifier" | "chrome";
@@ -41,9 +58,11 @@ export interface TokenKeyDef {
   key: string;
   label: string;
   category: TokenCategory;
-  /** Omitted for true modifiers -- they default to `inherit`, not a fixed color. See module doc comment for the type-as-modifier exception. */
+  /** Omitted for most modifiers -- see module doc comment. */
   defaultLight?: string;
   defaultDark?: string;
+  /** Another `TOKEN_KEYS` key this one wraps and, unset, visually defers to -- see module doc comment. Display-only; doesn't affect the real CSS. */
+  fallbackKey?: string;
 }
 
 export const TOKEN_KEYS: TokenKeyDef[] = [
@@ -59,8 +78,6 @@ export const TOKEN_KEYS: TokenKeyDef[] = [
     defaultDark: "#79c0ff",
   },
   { key: "number", label: "Number", category: "syntax", defaultLight: "#0550ae", defaultDark: "#79c0ff" },
-  { key: "escape", label: "Escape sequence", category: "syntax", defaultLight: "#0550ae", defaultDark: "#79c0ff" },
-  { key: "label", label: "Label", category: "syntax", defaultLight: "#8250df", defaultDark: "#d2a8ff" },
   { key: "variable", label: "Variable", category: "syntax", defaultLight: "#953800", defaultDark: "#ffa657" },
   {
     key: "subroutine-name",
@@ -110,20 +127,8 @@ export const TOKEN_KEYS: TokenKeyDef[] = [
   { key: "mod-vaxx", label: "vaxx (event variable)", category: "modifier" },
   { key: "mod-ovxx", label: "ovxx (TARG object variable)", category: "modifier" },
   { key: "mod-mvxx", label: "mvxx (OWNR object variable)", category: "modifier" },
-  {
-    key: "rvalue",
-    label: "Command rvalue",
-    category: "modifier",
-    defaultLight: "#0550ae",
-    defaultDark: "#79c0ff",
-  },
-  {
-    key: "lvalue",
-    label: "Command lvalue",
-    category: "modifier",
-    defaultLight: "#953800",
-    defaultDark: "#ffa657",
-  },
+  { key: "rvalue", label: "Command rvalue", category: "modifier", fallbackKey: "command" },
+  { key: "lvalue", label: "Command lvalue", category: "modifier", fallbackKey: "command" },
   { key: "mod-command-prefix", label: "Command prefix word", category: "modifier" },
   { key: "mod-command-suffix", label: "Command suffix word", category: "modifier" },
   { key: "mod-quote-string", label: "Quoted string", category: "modifier" },
@@ -138,19 +143,12 @@ export const TOKEN_KEYS: TokenKeyDef[] = [
   { key: "mod-official", label: "CAOS2PRAY official tag", category: "modifier" },
   { key: "mod-found", label: "Resolved identifier", category: "modifier" },
   { key: "mod-not-found", label: "Unresolved identifier", category: "modifier" },
-  {
-    key: "caos2pray-tag",
-    label: "CAOS2PRAY tag",
-    category: "modifier",
-    defaultLight: "#986801",
-    defaultDark: "#d29922",
-  },
+  { key: "caos2pray-tag", label: "CAOS2PRAY tag", category: "modifier", fallbackKey: "caos2-directive" },
   {
     key: "caos2pray-command",
     label: "CAOS2PRAY command",
     category: "modifier",
-    defaultLight: "#986801",
-    defaultDark: "#d29922",
+    fallbackKey: "caos2-directive",
   },
 
   // --- Chrome (touch targets, inlay hints) ---

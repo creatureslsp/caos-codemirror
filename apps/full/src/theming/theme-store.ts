@@ -102,11 +102,23 @@ export function getTokenLinkTarget(mode: ThemeMode, key: string): string | undef
   return isLink(value) ? value.linkedTo : undefined;
 }
 
-/** `key`'s effective literal color: follows link chains, falling back to the (chain-current) token's built-in default. */
-export function getResolvedTokenColor(mode: ThemeMode, key: string): string | undefined {
+/**
+ * `key`'s effective literal color: follows link chains, falling back to the
+ * (chain-current) token's built-in default -- or, for a key with no default
+ * of its own (`fallbackKey`, e.g. `rvalue` -> `command`; see token-keys.ts's
+ * module comment), the resolved color of the token it wraps. Purely a
+ * display concern for `TokenColorControl`'s swatch and similar -- the real
+ * CSS resolves this same relationship independently via its own
+ * `var(--caos-x, var(--caos-y, ...))` chains.
+ */
+export function getResolvedTokenColor(mode: ThemeMode, key: string, seen: ReadonlySet<string> = new Set()): string | undefined {
+  if (seen.has(key)) return undefined;
+  const nextSeen = new Set(seen).add(key);
   return resolveTokenColor(themeOverrides.value, mode, key, (k) => {
     const def = findTokenKey(k);
-    return mode === "light" ? def?.defaultLight : def?.defaultDark;
+    const own = mode === "light" ? def?.defaultLight : def?.defaultDark;
+    if (own !== undefined) return own;
+    return def?.fallbackKey ? getResolvedTokenColor(mode, def.fallbackKey, nextSeen) : undefined;
   });
 }
 

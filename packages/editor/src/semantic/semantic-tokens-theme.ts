@@ -53,8 +53,6 @@ function colorRule({ cls, light, dark, extra = {}, darkExtra = extra }: ColorRul
 
 const TYPE_RULES: ColorRuleSpec[] = [
   { cls: "cm-caos-sem-command", light: "var(--caos-command, #8250df)", dark: "var(--caos-command-dark, #d2a8ff)" },
-  { cls: "cm-caos-sem-rvalue", light: "var(--caos-rvalue, #0550ae)", dark: "var(--caos-rvalue-dark, #79c0ff)" },
-  { cls: "cm-caos-sem-lvalue", light: "var(--caos-lvalue, #953800)", dark: "var(--caos-lvalue-dark, #ffa657)" },
   { cls: "cm-caos-sem-string", light: "var(--caos-string, #0a7d34)", dark: "var(--caos-string-dark, #7ee787)" },
   { cls: "cm-caos-sem-token", light: "var(--caos-token, #6e7781)", dark: "var(--caos-token-dark, #8b949e)" },
   { cls: "cm-caos-sem-variable", light: "var(--caos-variable, #953800)", dark: "var(--caos-variable-dark, #ffa657)" },
@@ -82,17 +80,6 @@ const TYPE_RULES: ColorRuleSpec[] = [
   },
   { cls: "cm-caos-sem-eqOp", light: "var(--caos-eq-op, #cf222e)", dark: "var(--caos-eq-op-dark, #ff7b72)" },
   { cls: "cm-caos-sem-eqJoin", light: "var(--caos-eq-join, #cf222e)", dark: "var(--caos-eq-join-dark, #ff7b72)" },
-  {
-    cls: "cm-caos-sem-caos2pray-tag",
-    light: "var(--caos-caos2pray-tag, #986801)",
-    dark: "var(--caos-caos2pray-tag-dark, #d29922)",
-    extra: { fontWeight: "bold" },
-  },
-  {
-    cls: "cm-caos-sem-caos2pray-command",
-    light: "var(--caos-caos2pray-command, #986801)",
-    dark: "var(--caos-caos2pray-command-dark, #d29922)",
-  },
   // caos2pray-hash: the `*#` directive-line prefix marker, distinct from
   // caos2pray-tag (the key after it) -- shares the same CAOS2Pray-family
   // default as caos2-hash (Layer 1's immediate, unconfirmed heuristic for
@@ -154,6 +141,45 @@ const TYPE_RULES: ColorRuleSpec[] = [
 const COMMAND_LVALUE_RVALUE_CHAIN_LIGHT = "var(--caos-command, var(--caos-lvalue, var(--caos-rvalue, #8250df)))";
 const COMMAND_LVALUE_RVALUE_CHAIN_DARK =
   "var(--caos-command-dark, var(--caos-lvalue-dark, var(--caos-rvalue-dark, #d2a8ff)))";
+
+// rvalue/lvalue/caos2pray-tag/caos2pray-command: unlike the true modifiers
+// below, these are semantic *types* in their own right (semantics-legend.ts
+// tokenTypes, not tokenModifiers) -- but they're still chain-only, no
+// independent color of their own, because every real token classified as
+// one of these always wraps another element's span (confirmed via a live
+// DOM dump): rvalue/lvalue always wrap Layer 1's blanket `.cm-caos-command`
+// 4-char-shape heuristic (`command`, the same class *every* 4-char-shaped
+// word gets immediately, before Layer 2 confirms what it actually is), and
+// caos2pray-tag/caos2pray-command always wrap Layer 1's
+// `.cm-caos-caos2-directive` span. Left unset, they're meant to be
+// invisible -- the wrapped span's own color (respecting *its* own override)
+// shows through untouched, exactly like a true modifier chaining to its
+// type. token-keys.ts's `fallbackKey` records this same relationship for
+// `getResolvedTokenColor`'s display purposes; it has no effect on the CSS
+// below, which encodes the relationship independently via its own chain.
+const RVALUE_LVALUE_CAOS2PRAY_TAG_RULES: ColorRuleSpec[] = [
+  {
+    cls: "cm-caos-sem-rvalue",
+    light: "var(--caos-rvalue, var(--caos-command, #8250df))",
+    dark: "var(--caos-rvalue-dark, var(--caos-command-dark, #d2a8ff))",
+  },
+  {
+    cls: "cm-caos-sem-lvalue",
+    light: "var(--caos-lvalue, var(--caos-command, #8250df))",
+    dark: "var(--caos-lvalue-dark, var(--caos-command-dark, #d2a8ff))",
+  },
+  {
+    cls: "cm-caos-sem-caos2pray-tag",
+    light: "var(--caos-caos2pray-tag, var(--caos-caos2-directive, #986801))",
+    dark: "var(--caos-caos2pray-tag-dark, var(--caos-caos2-directive-dark, #d29922))",
+    extra: { fontWeight: "bold" },
+  },
+  {
+    cls: "cm-caos-sem-caos2pray-command",
+    light: "var(--caos-caos2pray-command, var(--caos-caos2-directive, #986801))",
+    dark: "var(--caos-caos2pray-command-dark, var(--caos-caos2-directive-dark, #d29922))",
+  },
+];
 
 const MODIFIER_RULES: ColorRuleSpec[] = [
   {
@@ -228,8 +254,8 @@ const MODIFIER_RULES: ColorRuleSpec[] = [
   },
   {
     cls: "cm-caos-mod-official",
-    light: "var(--caos-mod-official, var(--caos-caos2pray-tag, #986801))",
-    dark: "var(--caos-mod-official-dark, var(--caos-caos2pray-tag-dark, #d29922))",
+    light: "var(--caos-mod-official, var(--caos-caos2pray-tag, var(--caos-caos2-directive, #986801)))",
+    dark: "var(--caos-mod-official-dark, var(--caos-caos2pray-tag-dark, var(--caos-caos2-directive-dark, #d29922)))",
   },
   {
     cls: "cm-caos-mod-found",
@@ -249,5 +275,8 @@ const MODIFIER_RULES: ColorRuleSpec[] = [
 ];
 
 export const semanticTokensTheme = EditorView.baseTheme(
-  Object.assign({}, ...[...TYPE_RULES, ...MODIFIER_RULES].map(colorRule)),
+  Object.assign(
+    {},
+    ...[...TYPE_RULES, ...RVALUE_LVALUE_CAOS2PRAY_TAG_RULES, ...MODIFIER_RULES].map(colorRule),
+  ),
 );
