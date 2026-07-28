@@ -88,8 +88,8 @@ export const TOKEN_KEYS: TokenKeyDef[] = [
   },
   { key: "comment", label: "Comment", category: "syntax", defaultLight: "#6a737d", defaultDark: "#8b949e" },
   { key: "token", label: "Token", category: "syntax", defaultLight: "#6e7781", defaultDark: "#8b949e" },
-  { key: "operator", label: "Compare operator", category: "syntax", defaultLight: "#cf222e", defaultDark: "#ff7b72" },
-  { key: "eq-join", label: "\"=\" join (and|or)", category: "syntax", defaultLight: "#cf222e", defaultDark: "#ff7b72" },
+  { key: "operator", label: "Eq Operator", category: "syntax", defaultLight: "#cf222e", defaultDark: "#ff7b72" },
+  { key: "eq-join", label: "Eq Join (and|or)", category: "syntax", defaultLight: "#cf222e", defaultDark: "#ff7b72" },
   {
     key: "caos2-directive",
     label: "CAOS2 directive",
