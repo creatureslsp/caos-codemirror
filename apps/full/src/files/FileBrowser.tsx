@@ -97,35 +97,54 @@ export function FileBrowser(props: FileBrowserProps) {
     setBrowsingProjectId(id);
   }
 
-  async function refreshProjects(): Promise<void> {
+  async function fetchProjects(): Promise<{ unfiltered: ProjectListItem[]; displayed: CaosProject[] }> {
     const sortOpts = { sortBy, sortDirection };
     const unfiltered = await listProjects(sortOpts);
-    setAllProjectsUnfiltered(unfiltered);
     const trimmed = searchQuery.trim();
-    setDisplayedProjects(trimmed === "" ? unfiltered : await searchProjects(trimmed, sortOpts));
+    const displayed = trimmed === "" ? unfiltered : await searchProjects(trimmed, sortOpts);
+    return { unfiltered, displayed };
   }
 
-  async function refreshFiles(): Promise<void> {
+  async function fetchFiles(): Promise<CaosFile[]> {
     const sortOpts = { sortBy, sortDirection };
     const trimmed = searchQuery.trim();
-    const result =
-      trimmed === ""
-        ? await listFilesInProject(activeProjectId, sortOpts)
-        : await searchFiles(trimmed, activeProjectId, sortOpts);
-    setFiles(result);
+    return trimmed === ""
+      ? await listFilesInProject(activeProjectId, sortOpts)
+      : await searchFiles(trimmed, activeProjectId, sortOpts);
   }
 
-  async function refreshTrash(): Promise<void> {
+  async function fetchTrash(): Promise<{ projects: CaosProject[]; files: CaosFile[] }> {
     const [projectsAll, filesAll] = await Promise.all([
       listProjects({ includeDeleted: true }),
       searchFiles("", undefined, { includeDeleted: true })
     ]);
-    setTrashedProjects(projectsAll.filter((p) => p.deletedDate !== null));
-    setTrashedFiles(filesAll.filter((f) => f.deletedDate !== null));
+    return {
+      projects: projectsAll.filter((p) => p.deletedDate !== null),
+      files: filesAll.filter((f) => f.deletedDate !== null)
+    };
   }
 
+  // Fetches projects/files/trash concurrently but applies all their setState
+  // calls together, synchronously, once every fetch has resolved -- Preact
+  // batches same-tick setState calls into a single re-render, so `files` and
+  // `allProjectsUnfiltered` (which FileList's `activeProject` lookup derives
+  // from) can never land in a render where one reflects the new scope and the
+  // other still reflects the old one. Setting them from two independently
+  // awaited functions (the previous shape) let whichever fetch resolved first
+  // commit alone, which could pair freshly-fetched files with a stale/empty
+  // project list; if any of those files had `variant: null`, FileList's
+  // `getEffectiveVariant(file, activeProject)` throws synchronously during
+  // render (no matching project = no fallback variant), crashing the whole
+  // file-browser subtree without a boundary. On a reload landing directly on
+  // a project's file list, this reproduced ~always: the project-scoped file
+  // fetch reliably beat the all-projects fetch.
   async function refreshAll(): Promise<void> {
-    await Promise.all([refreshProjects(), refreshFiles(), refreshTrash()]);
+    const [projects, files, trash] = await Promise.all([fetchProjects(), fetchFiles(), fetchTrash()]);
+    setAllProjectsUnfiltered(projects.unfiltered);
+    setDisplayedProjects(projects.displayed);
+    setFiles(files);
+    setTrashedProjects(trash.projects);
+    setTrashedFiles(trash.files);
   }
 
   useEffect(() => {
