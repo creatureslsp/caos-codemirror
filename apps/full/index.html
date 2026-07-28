@@ -8,11 +8,11 @@
     <style>
       :root { color-scheme: light dark; }
       html, body { height: 100%; margin: 0; font-family: system-ui, sans-serif; }
-      body { overflow: hidden; }
+      body { overflow: hidden; background: #fff; color: #111; }
       #app { position: fixed; inset: 0; }
 
       .shell-editor { position: absolute; inset: 0; }
-      .shell-editor .cm-editor { height: 100%; }
+      .shell-editor .cm-editor { height: 100%; background: #fff; }
 
       .shell-menu-button {
         position: fixed;
@@ -261,6 +261,43 @@
         padding-top: 4px;
         border-top: 1px solid #eee;
       }
+
+      /* Dark mode for everything outside CM6's own editor content -- the
+         app shell chrome (sheet, dialogs, segmented controls, chips) has no
+         connection to the --caos-* per-language-token system (that only
+         ever colors editor text, via CM6's own &dark base-theme selector)
+         or to this attribute on its own, so without these rules the shell
+         stayed light-colored regardless of theme mode. Driven by
+         `apply-theme.ts`'s `startApplyingDisplayMode()`, which mirrors
+         `effectiveMode` onto `<html data-theme>`. `#1e212b` matches this
+         file's own `theme-color` meta tag and `vite.config.ts`'s PWA
+         manifest `background_color` -- reused here, not a new color, so the
+         PWA splash screen and the app's own dark mode agree. */
+      :root[data-theme="dark"] body { background: #1e212b; color: #e6e6ef; }
+      :root[data-theme="dark"] .shell-editor .cm-editor { background: #1e212b; }
+      :root[data-theme="dark"] .shell-sheet { background: #262b3d; color: #e6e6ef; }
+      :root[data-theme="dark"] .files-dialog { background: #262b3d; color: #e6e6ef; }
+
+      :root[data-theme="dark"] .segmented-control { background: #2f3548; }
+      :root[data-theme="dark"] .segmented-control-segment { color: #b8bfd6; }
+      :root[data-theme="dark"] .segmented-control-segment--active {
+        background: #3a4160;
+        color: #e6e6ef;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      }
+
+      :root[data-theme="dark"] .file-browser { border-bottom-color: #3a3f55; }
+      :root[data-theme="dark"] .files-project-chip { background: #2f3548; color: #e6e6ef; border-color: #3a3f55; }
+      :root[data-theme="dark"] .files-project-chip--active { background: #3a4160; color: #e6e6ef; border-color: #3a4160; }
+      :root[data-theme="dark"] .files-row { border-bottom-color: #3a3f55; }
+      :root[data-theme="dark"] .files-row--active { background: #262b45; }
+
+      :root[data-theme="dark"] .theme-token-row { border-bottom-color: #3a3f55; }
+      :root[data-theme="dark"] .theme-swatch { border-color: rgba(255, 255, 255, 0.2); }
+      :root[data-theme="dark"] .theme-palette-row { background: #2f3548; }
+      :root[data-theme="dark"] .theme-preview-editor { border-color: #3a3f55; }
+      :root[data-theme="dark"] .theme-preview-token-bar { border-top-color: #3a3f55; }
+      :root[data-theme="dark"] .theme-inlay-advanced { border-top-color: #3a3f55; }
 
       .theme-inlay-hints { margin-top: 16px; }
       .theme-slider-row {

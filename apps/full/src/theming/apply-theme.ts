@@ -21,7 +21,14 @@ import { effect } from "@preact/signals";
 import { formatColor, parseColor } from "./companion-color.js";
 import { resolveTokenColor } from "./link-resolution.js";
 import { findTokenKey } from "./token-keys.js";
-import { inlayHintStyle, themeOverrides, type InlayHintStyle, type ThemeMode, type ThemeOverrides } from "./theme-store.js";
+import {
+  effectiveMode,
+  inlayHintStyle,
+  themeOverrides,
+  type InlayHintStyle,
+  type ThemeMode,
+  type ThemeOverrides,
+} from "./theme-store.js";
 
 function propertyName(mode: ThemeMode, key: string): string {
   return mode === "light" ? `--caos-${key}` : `--caos-${key}-dark`;
@@ -99,5 +106,22 @@ export function startApplyingTheme(root: HTMLElement = document.documentElement)
       if (!nextProperties.has(prop)) root.style.removeProperty(prop);
     }
     appliedProperties = nextProperties;
+  });
+}
+
+/**
+ * Reactively reflects `effectiveMode` onto `root` as a `data-theme`
+ * attribute. The `--caos-*` custom properties above only ever drive
+ * *language-token text colors* -- CM6's own `&dark` base-theme selector
+ * (`main.ts`'s `darkModeCompartment`) decides which of the light/dark pair
+ * applies inside the editor. Everything outside CM6 (the app shell's own
+ * background, the menu sheet, dialogs -- `index.html`'s plain CSS) has no
+ * connection to either mechanism, so without this it stays light-colored
+ * regardless of theme mode: `index.html`'s `:root[data-theme="dark"]` rules
+ * are what actually key off this attribute. Returns a disposer.
+ */
+export function startApplyingDisplayMode(root: HTMLElement = document.documentElement): () => void {
+  return effect(() => {
+    root.dataset.theme = effectiveMode.value;
   });
 }

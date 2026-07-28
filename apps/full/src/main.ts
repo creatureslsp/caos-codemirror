@@ -42,7 +42,7 @@ import {
 import { kvGet, kvSet } from "./storage/db.js";
 import { createAutosaveController, fileLoadAnnotation, LAST_OPENED_FILE_ID_KEY } from "./autosave.js";
 import { effectiveMode, loadThemeStore } from "./theming/theme-store.js";
-import { startApplyingTheme } from "./theming/apply-theme.js";
+import { startApplyingDisplayMode, startApplyingTheme } from "./theming/apply-theme.js";
 
 const GLOBAL_FALLBACK_VARIANT_KEY = "globalFallbackVariant";
 const DEFAULT_VARIANT: GameVariant = "DS";
@@ -159,9 +159,12 @@ async function main(): Promise<void> {
   // prefers-color-scheme listener before anything paints, then start
   // reactively applying overrides as --caos-* custom properties on the
   // document root (ancestor of the editor DOM) per
-  // ../../plan-webapp/07-theming-data-model-dark-light.md.
+  // ../../plan-webapp/07-theming-data-model-dark-light.md, and the
+  // app-shell-wide data-theme attribute (index.html's own light/dark CSS,
+  // outside the --caos-* token system entirely) alongside it.
   await loadThemeStore();
   startApplyingTheme();
+  startApplyingDisplayMode();
 
   const timing = chooseEngineLoadTiming();
   log(`Engine load timing chosen: "${timing}" (device/network heuristic).`);
