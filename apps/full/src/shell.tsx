@@ -47,8 +47,13 @@ export function Shell(props: ShellProps): ComponentChildren {
               <button type="button" onClick={() => setLogOpen((open) => !open)}>
                 {logOpen ? "Hide log" : "Show log"}
               </button>
-              <button type="button" class="shell-sheet-close" aria-label="Dismiss menu" onClick={() => setMenuOpen(false)}>
-                ×
+              <button
+                type="button"
+                class="icon-btn shell-sheet-close"
+                aria-label="Dismiss menu"
+                onClick={() => setMenuOpen(false)}
+              >
+                <span class="shell-sheet-close-icon">×</span>
               </button>
             </div>
             <div class="segmented-control shell-sheet-nav" role="tablist">

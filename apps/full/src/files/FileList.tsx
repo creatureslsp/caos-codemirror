@@ -1,7 +1,5 @@
-/** Files in the active project/root, with per-row rename/delete/move/variant-change actions. */
-import { useState } from "preact/hooks";
-import type { GameVariant } from "@creatures-codemirror/engine";
-import { GAME_VARIANTS } from "@creatures-codemirror/engine";
+/** Files in the active project/root, with a per-row actions menu for rename/move/delete. */
+import { useEffect, useRef, useState } from "preact/hooks";
 import type { CaosFile } from "../storage/files.js";
 import type { CaosProject } from "../storage/projects.js";
 import { getEffectiveVariant } from "../storage/projects.js";
@@ -18,25 +16,40 @@ export interface FileListProps {
   onRenameFile: (id: string, newName: string) => void;
   onDeleteFile: (id: string) => void;
   onMoveFile: (id: string, targetProjectId: string | null) => void;
-  onChangeFileVariant: (id: string, variant: GameVariant | null) => void;
 }
 
 export function FileList(props: FileListProps) {
-  const {
-    files,
-    activeProject,
-    moveTargets,
-    activeFileId,
-    onOpenFile,
-    onRenameFile,
-    onDeleteFile,
-    onMoveFile,
-    onChangeFileVariant
-  } = props;
+  const { files, activeProject, moveTargets, activeFileId, onOpenFile, onRenameFile, onDeleteFile, onMoveFile } =
+    props;
 
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [movingId, setMovingId] = useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  // Closes the open actions menu on an outside click or Escape. Listening on
+  // `mousedown` (not `click`) means this runs *before* the trigger button's
+  // own `onClick` toggle, so clicking the trigger while its menu is open
+  // still lands on a single, correct closed-then-toggled state rather than
+  // fighting it.
+  useEffect(() => {
+    if (openMenuId === null) return;
+    function handlePointerDown(event: MouseEvent): void {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenMenuId(null);
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent): void {
+      if (event.key === "Escape") setOpenMenuId(null);
+    }
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [openMenuId]);
 
   if (files.length === 0) {
     return <p class="files-empty">No files here yet.</p>;
@@ -48,6 +61,7 @@ export function FileList(props: FileListProps) {
         const effectiveVariant = getEffectiveVariant(file, activeProject);
         const isRenaming = renamingId === file.id;
         const isMoving = movingId === file.id;
+        const isMenuOpen = openMenuId === file.id;
 
         return (
           <li key={file.id} class={file.id === activeFileId ? "files-row files-row--active" : "files-row"}>
@@ -78,37 +92,51 @@ export function FileList(props: FileListProps) {
             )}
 
             <div class="files-row-actions">
-              <select
-                aria-label={`Variant for ${file.name}`}
-                class="files-row-variant-select"
-                value={file.variant ?? ""}
-                onChange={(event) => {
-                  const value = (event.target as HTMLSelectElement).value;
-                  onChangeFileVariant(file.id, value === "" ? null : (value as GameVariant));
-                }}
-              >
-                {activeProject !== null && <option value="">Inherit ({activeProject.variant})</option>}
-                {GAME_VARIANTS.map((variant) => (
-                  <option key={variant} value={variant}>
-                    {variant}
-                  </option>
-                ))}
-              </select>
               <button
                 type="button"
-                onClick={() => {
-                  setRenamingId(file.id);
-                  setRenameValue(file.name);
-                }}
+                class="icon-btn files-row-menu-trigger"
+                aria-label={`Actions for ${file.name}`}
+                aria-haspopup="true"
+                aria-expanded={isMenuOpen}
+                onClick={() => setOpenMenuId(isMenuOpen ? null : file.id)}
               >
-                Rename
+                ⋮
               </button>
-              <button type="button" onClick={() => setMovingId(isMoving ? null : file.id)}>
-                Move
-              </button>
-              <button type="button" onClick={() => onDeleteFile(file.id)}>
-                Delete
-              </button>
+              {isMenuOpen && (
+                <div class="files-row-menu" role="menu" ref={menuRef}>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setRenamingId(file.id);
+                      setRenameValue(file.name);
+                      setOpenMenuId(null);
+                    }}
+                  >
+                    Rename
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setMovingId(isMoving ? null : file.id);
+                      setOpenMenuId(null);
+                    }}
+                  >
+                    Move
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      onDeleteFile(file.id);
+                      setOpenMenuId(null);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
             </div>
 
             {isMoving && (

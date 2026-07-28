@@ -9,7 +9,6 @@ import { useEffect, useState } from "preact/hooks";
 import type { GameVariant } from "@creatures-codemirror/engine";
 import { GAME_VARIANTS } from "@creatures-codemirror/engine";
 import {
-  changeFileVariant,
   createFile,
   hardDeleteFile,
   listFilesInProject,
@@ -38,6 +37,7 @@ import {
 import { kvGet, kvSet } from "../storage/db.js";
 import type { SortDirection, SortField } from "../storage/search.js";
 import { downloadAsCosFile, pickCosFileFromDisk } from "./file-io.js";
+import { NewFileIcon, OpenFileIcon, DownloadIcon } from "./icons.js";
 import { ProjectSwitcher } from "./ProjectSwitcher.js";
 import { FileList } from "./FileList.js";
 import { SearchBar } from "./SearchBar.js";
@@ -253,12 +253,6 @@ export function FileBrowser(props: FileBrowserProps) {
     await refreshAll();
   }
 
-  async function handleChangeFileVariant(id: string, variant: GameVariant | null): Promise<void> {
-    const updated = await changeFileVariant(id, variant);
-    await refreshAll();
-    if (activeFile?.id === id) setActiveFile(updated);
-  }
-
   async function handleCreateProject(name: string, variant: GameVariant): Promise<void> {
     await createProject({ name, variant });
     await refreshAll();
@@ -361,14 +355,26 @@ export function FileBrowser(props: FileBrowserProps) {
       />
 
       <div class="file-browser-file-actions">
-        <button type="button" onClick={handleNewFile}>
-          + New file
+        <button type="button" class="icon-btn" title="New file" aria-label="New file" onClick={handleNewFile}>
+          <NewFileIcon />
         </button>
-        <button type="button" onClick={() => void handleOpenFromDisk()}>
-          Open from disk…
+        <button
+          type="button"
+          class="icon-btn"
+          title="Open from disk"
+          aria-label="Open from disk"
+          onClick={() => void handleOpenFromDisk()}
+        >
+          <OpenFileIcon />
         </button>
-        <button type="button" onClick={handleDownload}>
-          Download current file
+        <button
+          type="button"
+          class="icon-btn"
+          title="Download current file"
+          aria-label="Download current file"
+          onClick={handleDownload}
+        >
+          <DownloadIcon />
         </button>
       </div>
 
@@ -381,7 +387,6 @@ export function FileBrowser(props: FileBrowserProps) {
         onRenameFile={(id, newName) => void attemptRenameFile(id, newName)}
         onDeleteFile={(id) => void handleDeleteFile(id)}
         onMoveFile={(id, targetProjectId) => void attemptMoveFile(id, targetProjectId)}
-        onChangeFileVariant={(id, variant) => void handleChangeFileVariant(id, variant)}
       />
 
       <button type="button" class="files-trash-toggle" onClick={() => setShowTrash((open) => !open)}>

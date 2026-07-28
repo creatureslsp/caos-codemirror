@@ -98,6 +98,46 @@
       .shell-sheet-nav { margin: 12px 0; }
       .shell-sheet-body-hidden { display: none; }
 
+      /* Base chrome for every plain action button inside the menu sheet
+         (dialog actions, per-row menus, trash/restore, show-log, close) so
+         they read as one consistent system instead of bare browser buttons.
+         The segmented control, project chips, and the full-width file-name
+         row button keep their own distinct looks and are excluded. */
+      .shell-sheet button:not(.segmented-control-segment):not(.files-project-chip):not(.files-row-name) {
+        font: inherit;
+        color: inherit;
+        background: #f2f2f4;
+        border: 1px solid #d8d8dc;
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .shell-sheet button:not(.segmented-control-segment):not(.files-project-chip):not(.files-row-name):hover {
+        background: #e6e6ea;
+      }
+      .shell-sheet button:not(.segmented-control-segment):not(.files-project-chip):not(.files-row-name):disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      /* Icon-only variant (New file / Open from disk / Download / per-row
+         "⋮" trigger / sheet close) -- a fixed-size square instead of the
+         text button's horizontal padding. */
+      button.icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        flex: none;
+        font-size: 18px;
+        line-height: 1;
+      }
+      .icon-btn svg { width: 18px; height: 18px; }
+
+
       .settings-tab-strip { margin-bottom: 12px; }
       .settings-tab-body h2 { margin-top: 0; }
 
@@ -161,9 +201,29 @@
       .files-row--active { background: #f5f8ff; }
       .files-row-name { flex: 1; min-width: 100%; text-align: left; background: none; border: none; padding: 0; }
       .files-row-meta { display: block; font-size: 11px; opacity: 0.65; }
-      .files-row-actions { display: flex; flex-wrap: wrap; gap: 4px; font-size: 12px; }
-      .files-row-variant-select { font-size: 12px; }
+      .files-row-actions { position: relative; display: flex; align-items: center; }
       .files-row-move { flex-basis: 100%; }
+
+      /* Per-file actions popover (Rename/Move/Delete), anchored under the
+         row's "⋮" trigger -- replaces what used to be three always-visible
+         buttons (plus a variant `<select>`, now redundant with the single
+         current-file VariantPicker rendered below the file list). */
+      .files-row-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 120px;
+        background: #fff;
+        border: 1px solid #d8d8dc;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 4px;
+      }
+      .files-row-menu button { justify-content: flex-start; width: 100%; text-align: left; }
 
       .files-trash-toggle { font-size: 13px; margin-top: 8px; }
       .files-trash-list { list-style: none; margin: 8px 0 0; padding: 0; }
@@ -291,6 +351,16 @@
       :root[data-theme="dark"] .files-project-chip--active { background: #3a4160; color: #e6e6ef; border-color: #3a4160; }
       :root[data-theme="dark"] .files-row { border-bottom-color: #3a3f55; }
       :root[data-theme="dark"] .files-row--active { background: #262b45; }
+      :root[data-theme="dark"] .files-row-menu { background: #262b3d; border-color: #3a3f55; }
+
+      :root[data-theme="dark"] .shell-sheet button:not(.segmented-control-segment):not(.files-project-chip):not(.files-row-name) {
+        background: #2f3548;
+        border-color: #3a3f55;
+        color: #e6e6ef;
+      }
+      :root[data-theme="dark"] .shell-sheet button:not(.segmented-control-segment):not(.files-project-chip):not(.files-row-name):hover {
+        background: #3a4160;
+      }
 
       :root[data-theme="dark"] .theme-token-row { border-bottom-color: #3a3f55; }
       :root[data-theme="dark"] .theme-swatch { border-color: rgba(255, 255, 255, 0.2); }
