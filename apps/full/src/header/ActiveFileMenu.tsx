@@ -19,7 +19,7 @@ import { getProject, listProjects, type ProjectListItem } from "../storage/proje
 import { activeFile, activeProject } from "../files/active-file-store.js";
 import { bumpFilesRevision } from "../files/refresh-bus.js";
 import { ConfirmMoveDialog } from "../files/ConfirmMoveDialog.js";
-import { MoreHorizIcon } from "../icons.js";
+import {MoreVertIcon} from "../icons.js";
 
 export interface ActiveFileMenuProps {
   /** Called after the active file is trashed, with a fresh fallback draft already loaded into the editor. */
@@ -162,7 +162,7 @@ export function ActiveFileMenu(props: ActiveFileMenuProps) {
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
       >
-        <MoreHorizIcon />
+        <MoreVertIcon />
       </button>
       {open && (
         <div class="header-dropdown" role="menu">
