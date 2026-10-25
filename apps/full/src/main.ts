@@ -14,6 +14,7 @@ import {
   DEFAULT_INLAY_HINT_OPTIONS,
   inlayHints,
   inlayHintTheme,
+  isCoarsePointer,
   mobileHoverTrigger,
   mobileViewport,
   semanticTokens,
@@ -221,7 +222,13 @@ async function main(): Promise<void> {
       semanticTokensTheme,
       caosLinter({ client, getVariant: () => currentVariant }),
       lintGutter(),
-      caosCompletion({ client, getVariant: () => currentVariant }),
+      caosCompletion({
+        client,
+        getVariant: () => currentVariant,
+        // Virtual keyboards have no Tab key to cycle through snippet
+        // placeholders, so skip inserting them on touch devices.
+        usePlaceholders: () => !isCoarsePointer(),
+      }),
       caosHoverTooltip({ client, getVariant: () => currentVariant }),
       inlayHints({ client, getVariant: () => currentVariant }),
       inlayHintTheme,
