@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@codemirror/state": "^6.4.1",
-    "@creatureslsp/caos": "0.0.7",
+    "@creatureslsp/caos": "file://../../../vs-caos-editor/packages/caos",
     "vscode-languageserver-types": "^3.18.0"
   },
   "devDependencies": {
