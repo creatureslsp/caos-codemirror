@@ -7,12 +7,16 @@ import { lspCompletionItemToCM6 } from "./item-converter.js";
 export interface CaosCompletionSourceOptions {
   client: CaosEngineClient;
   getVariant: () => GameVariant;
+  /** Snippet tab-stop placeholders for command parameters. Defaults to
+   * always-true. Return false on touch devices — their virtual keyboards
+   * have no Tab key to cycle through placeholders once inserted. */
+  usePlaceholders?: () => boolean;
 }
 
 const WORD_PATTERN = /[A-Za-z_:][A-Za-z0-9_:]*/;
 
 export function caosCompletionSource(options: CaosCompletionSourceOptions) {
-  const { client, getVariant } = options;
+  const { client, getVariant, usePlaceholders } = options;
 
   return async (context: CompletionContext): Promise<CompletionResult | null> => {
     const word = context.matchBefore(WORD_PATTERN);
@@ -25,7 +29,7 @@ export function caosCompletionSource(options: CaosCompletionSourceOptions) {
 
     let response;
     try {
-      response = await client.getCompletions(variant, text, line, character);
+      response = await client.getCompletions(variant, text, line, character, usePlaceholders?.());
     } catch {
       return null;
     }
