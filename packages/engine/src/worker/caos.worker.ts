@@ -117,7 +117,7 @@ async function handleRequest(request: Exclude<RpcRequest, { type: "cancel" }>): 
       ensureInitialized();
       const keepGoing = keepGoingFor(request.id);
       const settings: CaosCompletionSettings = {
-        usePlaceholders: true,
+        usePlaceholders: request.usePlaceholders ?? true,
         dumbMode: false,
         parameterInlayHints: false,
         minimumParameterCount: 2,

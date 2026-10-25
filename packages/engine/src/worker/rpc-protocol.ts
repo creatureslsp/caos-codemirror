@@ -74,6 +74,10 @@ export interface GetCompletionsRequest extends RpcRequestBase {
   /** 0-indexed line/character, converted from the CM6 cursor offset. */
   line: number;
   character: number;
+  /** Snippet tab-stop placeholders for parameters. Defaults to true; pass
+   * false on touch devices, whose virtual keyboards have no Tab key to
+   * cycle through them. */
+  usePlaceholders?: boolean;
 }
 
 export interface GetCompletionsResponse extends RpcResponseBase {

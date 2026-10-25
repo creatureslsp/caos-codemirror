@@ -110,6 +110,7 @@ export class CaosEngineClient {
     text: string,
     line: number,
     character: number,
+    usePlaceholders?: boolean,
   ): Promise<GetCompletionsResponse> {
     return this.send({
       type: "getCompletions",
@@ -117,6 +118,7 @@ export class CaosEngineClient {
       text,
       line,
       character,
+      usePlaceholders,
     }) as Promise<GetCompletionsResponse>;
   }
 
