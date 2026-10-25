@@ -48,3 +48,4 @@ export type { MobileViewportOptions } from "./mobile/viewport.js";
 export { touchTheme } from "./mobile/touch-theme.js";
 export { completionTrigger } from "./mobile/completion-trigger.js";
 export type { CompletionTriggerOptions } from "./mobile/completion-trigger.js";
+export { isCoarsePointer } from "./mobile/pointer.js";
