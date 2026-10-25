@@ -37,11 +37,6 @@ const MODE_OPTIONS: { id: ThemeModeSetting; label: string }[] = [
   { id: "dark", label: "Dark" },
 ];
 
-const EDITING_MODE_OPTIONS: { id: ThemeMode; label: string }[] = [
-  { id: "light", label: "Light" },
-  { id: "dark", label: "Dark" },
-];
-
 const DEFAULT_NEW_OVERRIDE_COLOR = "#888888";
 
 function segmentClass(active: boolean): string {
@@ -205,7 +200,7 @@ export interface ThemeTabProps {
 }
 
 export function ThemeTab({ client, legend }: ThemeTabProps) {
-  const [editingMode, setEditingMode] = useState<ThemeMode>(() => effectiveMode.value);
+  const editingMode = effectiveMode.value;
 
   const syntaxKeys = TOKEN_KEYS.filter((t) => t.category === "syntax");
   const modifierKeys = TOKEN_KEYS.filter((t) => t.category === "modifier");
@@ -246,22 +241,6 @@ export function ThemeTab({ client, legend }: ThemeTabProps) {
         ))}
       </div>
       <p class="theme-effective-mode">Currently displaying: {effectiveMode.value}</p>
-
-      <h3>Editing colors for</h3>
-      <div class="segmented-control theme-editing-mode-switcher" role="tablist">
-        {EDITING_MODE_OPTIONS.map((opt) => (
-          <button
-            type="button"
-            role="tab"
-            key={opt.id}
-            aria-selected={editingMode === opt.id}
-            class={segmentClass(editingMode === opt.id)}
-            onClick={() => setEditingMode(opt.id)}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
 
       <h3>Preview</h3>
       <p class="theme-token-hint">Tap a token to edit its color — updates live as you change colors below.</p>
